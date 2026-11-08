@@ -121,7 +121,7 @@ Put these in `.env` (see `.env.example`) or the environment.
 | `HYP_CHAIN_ID` / `HYP_RPC_URL` | default `999` / the public mainnet RPC (testnet is `998`) |
 | `HYP_BROWSER_RPC_URL` | the RPC sent to visitors' wallets and browsers: keep any key-bearing URL out of it |
 | `METADATA_HOSTS` | extra hosts allowed for coin metadata (IPFS gateways are built in) |
-| `TOKEN_CA` | the project's own token (Solana mint). Shown on the landing screen with a Copy button and a `pump.fun/coin/<CA>` link; unset shows "Coming soon" |
+| `TOKEN_CA` | the project's own token (Solana mint). Shown on the landing screen with a Copy button and a `pump.fun/coin/<CA>` link; unset shows "Coming soon". It is also pinned first in the Launches grid as an **Official** card: name, image and links are read from the token's own on-chain metadata (the image is cached on this server), live numbers come from DexScreener, and the card links to pump.fun to trade (pump.fun prices it in HYPE, which the site's SOL-only trade engine does not support) |
 | `X_URL` | official X account, default `https://x.com/useelytheia` (landing screen, footer) |
 
 The opening screen plays `intro.mp4` once (no loop), then settles on the landing screen (background `public/brand/hero.jpg`,

@@ -472,3 +472,20 @@ details.faq p { margin: 8px 0 0; color: #4b4538; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ---- the project's own token card (pinned first in the Launches grid) */
+.coin-card.official { border-color: #e2b25a; box-shadow: 0 0 0 1px #f3cf7f40, 0 10px 34px #d9a44126; }
+.coin-card .official-link { display: flex; flex-direction: column; gap: 12px; color: inherit; text-decoration: none; }
+.coin-card .official-link:hover { text-decoration: none; }
+.badge.official { background: var(--gold-grad); color: #2a1c05; }
+.official-avatar { background: var(--navy2); }
+.official-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.official-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; position: relative; z-index: 1; }
+.ca-chip {
+  display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; font-size: 12.5px; color: inherit; cursor: pointer;
+  background: #ffffff12; border: 1px solid #ffffff2e; border-radius: 999px; transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+.ca-chip:hover { background: #ffffff22; border-color: #f3cf7fb3; }
+.ca-chip.ok { color: #0b1226; background: var(--gold2); border-color: var(--gold2); }
+.ca-chip-label { font-weight: 700; font-size: 11px; letter-spacing: 0.14em; color: var(--gold2); }
+.ca-chip.ok .ca-chip-label { color: #0b1226; }

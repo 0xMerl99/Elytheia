@@ -37,6 +37,7 @@ import { importSolanaMint, indexSolana, registerCreateSignature } from './chain/
 import { launchpadAbi } from '../shared/launchpadAbi.js';
 import { sseHandler } from './stream.js';
 import { checkRpcBody } from './rpcProxy.js';
+import { getProjectToken } from './projectToken.js';
 
 export const api = Router();
 
@@ -100,6 +101,12 @@ api.get('/config', (_req, res) => {
 });
 
 api.get('/stats', (_req, res) => res.json(globalStats()));
+
+/** The project's own token (TOKEN_CA) for the official card: identity from the chain, live numbers from DexScreener. */
+api.get('/project-token', async (_req, res) => {
+  res.set('cache-control', 'public, max-age=15');
+  res.json({ token: await getProjectToken() });
+});
 api.get('/stream', sseHandler);
 
 /* ------------------------------------------------------------ solana rpc proxy */

@@ -3,10 +3,12 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useApp } from '../lib/app';
 import { useNow, useStream } from '../lib/stream';
-import type { Coin, GlobalTrade, Stats } from '../lib/types';
+import { useFetch } from '../lib/useFetch';
+import type { Coin, GlobalTrade, ProjectToken, Stats } from '../lib/types';
 import { clsx, fmtNum, fmtPct, fmtUsd, shortAddr } from '../lib/format';
 import { ChainBadge, CoinAvatar } from '../components/Brand';
 import { CoinCard, CoinCardSkeleton } from '../components/CoinCard';
+import { ProjectTokenCard } from '../components/ProjectTokenCard';
 import { IBolt, ILock, IRocket, IShield } from '../components/Icons';
 import { CtaArt, glowPointer, HeroArt, Laurel, Reveal, useOlympusTheme } from '../components/Olympus';
 import '../styles/olympus.css';
@@ -40,6 +42,9 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [fresh, setFresh] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState(q);
+  // the project's own token: pinned first in the grid unless the visitor is searching or filtering to another chain
+  const projectToken = useFetch<{ token: ProjectToken | null }>('/project-token').data?.token ?? null;
+  const showOfficial = !!projectToken && !q && (chain === '' || chain === 'sol');
   const reqSeq = useRef(0);
 
   useEffect(() => {
@@ -259,6 +264,11 @@ export default function Home() {
           {!coins && !error && (
             <div className="coin-grid">{Array.from({ length: 6 }).map((_, i) => <CoinCardSkeleton key={i} />)}</div>
           )}
+          {coins && coins.length === 0 && showOfficial && projectToken && (
+            <div className="coin-grid" style={{ marginBottom: 16 }}>
+              <ProjectTokenCard token={projectToken} />
+            </div>
+          )}
           {coins && coins.length === 0 && (
             <div className="empty card">
               <h3>{q ? 'No coins match that search' : 'No coins here yet'}</h3>
@@ -269,6 +279,7 @@ export default function Home() {
           {coins && coins.length > 0 && (
             <>
               <div className="coin-grid">
+                {showOfficial && projectToken && <ProjectTokenCard token={projectToken} />}
                 {coins.map((c) => (
                   <CoinCard key={c.id} coin={c} fresh={fresh.has(c.id)} now={now} />
                 ))}

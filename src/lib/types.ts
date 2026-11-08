@@ -37,6 +37,26 @@ export interface SolanaConfig {
   cluster: string;
 }
 
+/** The project's own token (TOKEN_CA): identity from the chain, live numbers from DexScreener. See server/projectToken.ts. */
+export interface ProjectToken {
+  mint: string;
+  name: string | null;
+  symbol: string | null;
+  description: string;
+  image: string | null;
+  imageFallbacks: string[];
+  website: string | null;
+  twitter: string | null;
+  telegram: string | null;
+  pumpUrl: string;
+  quoteSymbol: string | null;
+  priceUsd: number | null;
+  mcapUsd: number | null;
+  volume24Usd: number | null;
+  change24: number | null;
+  updatedAt: number;
+}
+
 export interface AppConfig {
   chains: ChainInfo[];
   prices: Prices;
