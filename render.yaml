@@ -1,0 +1,54 @@
+# Render blueprint: one web service that serves the built site and the API, with a persistent disk.
+#
+# Why a paid plan with a disk: the server keeps a SQLite database AND the images / metadata files that coins point to.
+# Those metadata links are written into the blockchain permanently, so the files must survive restarts and deploys.
+# On Render's free plan the filesystem is wiped on every deploy and spin-down, which would break coins for good.
+#
+# After the first deploy, set PUBLIC_URL to the final https address (ideally your own domain) BEFORE launching any coin.
+services:
+  - type: web
+    name: elytheia
+    runtime: node
+    plan: starter
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    disk:
+      name: elytheia-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: DATA_DIR
+        value: /var/data
+
+      # the public https address of this site (the Render URL or, better, your own domain). Coin metadata links are
+      # built from it and are PERMANENT on-chain: set it once, to the address you will keep.
+      - key: PUBLIC_URL
+        sync: false
+
+      # Elysium: the Uniswap v4 launchpad (see deployments/99901-v4.json)
+      - key: HYP_CHAIN_ID
+        value: "99901"
+      - key: HYP_CHAIN_NAME
+        value: Elysium
+      - key: HYP_RPC_URL
+        value: https://heliosliq.app/rpc
+      - key: HYP_BROWSER_RPC_URL
+        value: https://heliosliq.app/rpc
+      - key: HYP_LAUNCHPAD
+        value: "0xD6265C0e1c4EFeACF228B341cdF609486DaA24F1"
+      - key: HYP_START_BLOCK
+        value: "2470462"
+
+      # Solana: use a dedicated RPC (it carries a secret key, so it is set in the dashboard, never committed)
+      - key: SOL_RPC_URL
+        sync: false
+
+      # the project's own token (Solana mint) shown on the landing screen; leave empty until you have one
+      - key: TOKEN_CA
+        sync: false
+      - key: X_URL
+        value: https://x.com/useelytheia

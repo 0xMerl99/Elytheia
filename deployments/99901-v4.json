@@ -1,0 +1,18 @@
+{
+  "chainId": 99901,
+  "deployedAt": "2026-11-08T15:13:05.945Z",
+  "poolManager": "0xE2e105d3F7209A9DA11f83cCf3E7398a753823F1",
+  "hook": "0x5da6799D3a45435019bB75570A58C4f4E14d4080",
+  "launchpad": "0xD6265C0e1c4EFeACF228B341cdF609486DaA24F1",
+  "owner": "0x0Bb9A573a30F70539e5965c2EdFAbC0D95c4ae0B",
+  "deployer": "0x0Bb9A573a30F70539e5965c2EdFAbC0D95c4ae0B",
+  "startTick": -104820,
+  "startMarketCapHype": 35.64898431366236,
+  "launchFeeWei": "0",
+  "deployBlock": 2470462,
+  "transactions": {
+    "hook": "0xfe31cced5f6f5a4ab76393df1b828b46a4f9c54a0db7578ac667ea69f7594929",
+    "launchpad": "0xaac4aa8ced7aba22c148509bf0efd4f7cd67225ccd10d40179a6bab429303984",
+    "setFactory": "0x7593e73b7107e3c14362f005bb0c26b91a9ef1547194cd86b8a1e41916a2ffde"
+  }
+}

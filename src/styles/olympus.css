@@ -1,0 +1,1237 @@
+/* =====================================================================
+   Home page: "Olympus" theme. Midnight + marble + metallic gold + electric blue.
+   Every rule is scoped to `html.olympus` (set only while the Home page is mounted)
+   or `.oly` (the Home page root), so no other page or modal is affected.
+   Visual styling only: no markup semantics, routes or behaviour live here.
+   ===================================================================== */
+
+html.olympus {
+  --o-bg: #05070f;
+  --o-bg2: #080c1a;
+  --o-ink: #ece7da;
+  --o-marble: #f6f2e8;
+  --o-mute: #97a2bd;
+  --o-gold: #f3cf7f;
+  --o-gold2: #d9a441;
+  --o-blue: #6b9bff;
+  --o-line: rgba(255, 255, 255, 0.09);
+  --o-line2: rgba(255, 255, 255, 0.16);
+  --o-gold-metal: linear-gradient(180deg, #fff0c4 0%, #f3cf7f 24%, #d9a441 58%, #b07a22 80%, #e9bf63 100%);
+  --o-marble-text: linear-gradient(180deg, #ffffff 0%, #efeadd 55%, #b4bcd3 100%);
+  --o-glass: linear-gradient(150deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.02));
+  --o-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --meander: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='14' viewBox='0 0 28 14'%3E%3Cpath d='M0 13H5V2H21V13H28M21 9H11V5H15' fill='none' stroke='%23d9a441' stroke-width='1.2'/%3E%3C/svg%3E");
+  scrollbar-color: #28325a var(--o-bg);
+}
+html.olympus,
+html.olympus body {
+  background: var(--o-bg);
+}
+html.olympus ::selection {
+  background: rgba(243, 207, 127, 0.35);
+  color: #fff;
+}
+
+/* ------------------------------------------------------------- navigation */
+html.olympus .header {
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  border-bottom: 1px solid transparent;
+  transition: background 0.4s var(--o-ease), box-shadow 0.4s, border-color 0.4s, backdrop-filter 0.4s;
+}
+html.olympus[data-scrolled] .header {
+  background: rgba(5, 8, 18, 0.7);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+  border-bottom-color: rgba(243, 207, 127, 0.14);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+html.olympus .logo img {
+  filter: drop-shadow(0 0 10px rgba(243, 207, 127, 0.35));
+  transition: transform 0.5s var(--o-ease), filter 0.3s;
+}
+html.olympus .logo:hover img {
+  transform: rotate(-8deg) scale(1.06);
+  filter: drop-shadow(0 0 16px rgba(243, 207, 127, 0.6));
+}
+html.olympus .logo span {
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  background: linear-gradient(180deg, #fff 0%, #f3e6c1 55%, #d9a441 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+html.olympus .header nav {
+  gap: 30px;
+}
+html.olympus .header nav a {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(236, 231, 218, 0.68);
+  padding: 10px 0;
+  transition: color 0.25s;
+}
+html.olympus .header nav a:hover,
+html.olympus .header nav a.on {
+  color: #fff;
+  font-weight: 600;
+}
+html.olympus .header nav a::after,
+html.olympus .header nav a.on::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3px;
+  height: 1px;
+  border-radius: 0;
+  background: var(--o-gold-metal);
+  box-shadow: 0 0 10px rgba(243, 207, 127, 0.7);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--o-ease);
+}
+html.olympus .header nav a:hover::after,
+html.olympus .header nav a.on::after {
+  transform: scaleX(1);
+}
+html.olympus .hsearch input {
+  height: 40px;
+  color: var(--o-ink);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding-left: 38px;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+}
+html.olympus .hsearch input::placeholder {
+  color: #8591ad;
+}
+html.olympus .hsearch input:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+html.olympus .hsearch input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(243, 207, 127, 0.65);
+  box-shadow: 0 0 0 4px rgba(243, 207, 127, 0.12), 0 0 30px rgba(243, 207, 127, 0.1);
+}
+html.olympus .hsearch > svg {
+  z-index: 1;
+  color: #8f9ab4;
+  top: 12px;
+  left: 14px;
+  pointer-events: none;
+}
+html.olympus .header .pill {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+html.olympus .header .pill.live {
+  border-color: rgba(95, 224, 168, 0.35);
+}
+html.olympus .header .btn.dark {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 9px 18px;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+html.olympus .header .btn.dark:hover:not(:disabled) {
+  border-color: rgba(243, 207, 127, 0.6);
+  background: rgba(243, 207, 127, 0.1);
+  filter: none;
+}
+html.olympus .header .btn.gold.sm {
+  border-radius: 999px;
+  padding: 9px 20px;
+}
+html.olympus .balance-chip {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+/* header dropdowns become dark glass (their text uses --ink/--muted, so flip those locally) */
+html.olympus .search-pop,
+html.olympus .menu {
+  --ink: #ece7da;
+  --muted: #97a2bd;
+  --line: rgba(255, 255, 255, 0.1);
+  --card2: rgba(255, 255, 255, 0.07);
+  color: var(--ink);
+  background: rgba(9, 13, 28, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+html.olympus .search-pop .search-import {
+  background: rgba(243, 207, 127, 0.07);
+  border-color: rgba(243, 207, 127, 0.4);
+  color: var(--ink);
+}
+html.olympus .search-pop .search-import:hover:not(:disabled) {
+  background: rgba(243, 207, 127, 0.14);
+}
+html.olympus .search-pop .search-import .ico {
+  background: rgba(243, 207, 127, 0.18);
+  color: var(--o-gold);
+}
+
+/* side rail → floating glass dock */
+html.olympus .rail {
+  left: 10px;
+  top: 50%;
+  bottom: auto;
+  width: 46px;
+  padding: 10px 0;
+  gap: 6px;
+  transform: translateY(-50%);
+  background: rgba(8, 12, 26, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+html.olympus .rail a {
+  color: #8d97b3;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  transition: color 0.25s, background 0.25s, transform 0.25s var(--o-ease);
+}
+html.olympus .rail a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.1);
+}
+html.olympus .rail a.on {
+  color: #2a1c05;
+  background: var(--o-gold-metal);
+  box-shadow: 0 4px 16px rgba(217, 164, 65, 0.4);
+}
+html.olympus .rail a:hover::after {
+  left: 52px;
+  background: rgba(9, 13, 28, 0.95);
+  border: 1px solid rgba(243, 207, 127, 0.4);
+  border-radius: 9px;
+  font-family: var(--display);
+  letter-spacing: 0.08em;
+}
+html.olympus .bottom-nav {
+  background: rgba(6, 9, 20, 0.78);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: 0 -1px 0 rgba(243, 207, 127, 0.16);
+}
+html.olympus .bottom-nav a.on {
+  color: var(--o-gold);
+}
+
+/* ------------------------------------------------------------- buttons */
+:is(.oly, html.olympus .header) .btn {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s var(--o-ease), box-shadow 0.3s, filter 0.3s, background 0.3s, border-color 0.3s, color 0.3s;
+}
+:is(.oly, html.olympus .header) .btn.gold {
+  color: #2a1c05;
+  background: var(--o-gold-metal);
+  border: 1px solid rgba(255, 244, 214, 0.55);
+  box-shadow: 0 8px 28px rgba(217, 164, 65, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 -3px 8px rgba(120, 70, 0, 0.25);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+:is(.oly, html.olympus .header) .btn.gold::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -70%;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.7s var(--o-ease);
+  pointer-events: none;
+}
+:is(.oly, html.olympus .header) .btn.gold:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow: 0 16px 44px rgba(217, 164, 65, 0.5), 0 0 0 1px rgba(255, 244, 214, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -3px 8px rgba(120, 70, 0, 0.25);
+}
+:is(.oly, html.olympus .header) .btn.gold:hover:not(:disabled)::after {
+  left: 130%;
+}
+:is(.oly, html.olympus .header) .btn.gold:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+  filter: brightness(0.97);
+}
+.oly .btn.lg {
+  border-radius: 999px;
+  padding: 16px 32px;
+  font-size: 15.5px;
+  letter-spacing: 0.01em;
+}
+.oly .btn.outline-gold,
+.oly .btn.ghost {
+  color: #f1ead6;
+  background: rgba(14, 21, 48, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+.oly .btn.outline-gold:hover:not(:disabled),
+.oly .btn.ghost:hover:not(:disabled) {
+  color: #fff;
+  transform: translateY(-2px);
+  filter: none;
+  border-color: rgba(243, 207, 127, 0.7);
+  background: rgba(243, 207, 127, 0.1);
+  box-shadow: 0 12px 34px rgba(243, 207, 127, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+.oly .btn.outline-gold:active:not(:disabled),
+.oly .btn.ghost:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ------------------------------------------------------------- page tokens */
+.oly {
+  --ink: var(--o-ink);
+  --muted: var(--o-mute);
+  --line: var(--o-line);
+  --card: rgba(255, 255, 255, 0.04);
+  --card2: rgba(255, 255, 255, 0.05);
+  --green: #4fe0a8;
+  --green-bg: rgba(53, 192, 139, 0.14);
+  --red: #ff7b85;
+  --red-bg: rgba(255, 107, 117, 0.14);
+  position: relative;
+  color: var(--o-ink);
+}
+
+/* ------------------------------------------------------------- hero */
+.oly .hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(740px, 100svh, 960px);
+  margin: calc(-1 * var(--header)) 0 0 calc(-1 * var(--rail));
+  overflow: hidden;
+  color: #fff;
+  text-align: center;
+  background: var(--o-bg);
+  background-image: none;
+}
+.oly .hero::before {
+  display: none;
+}
+.hero-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  --px: 0;
+  --py: 0;
+  --sy: 0;
+}
+.hero-art .hl {
+  position: absolute;
+  inset: -30px -60px;
+  will-change: transform;
+  transform: translate3d(calc(var(--px) * var(--dx, 0) * 1px), calc(var(--py) * var(--dy, 0) * 1px + var(--sy) * var(--ds, 0) * 1px), 0);
+}
+.hero-art .hl svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.hero-art .sky {
+  inset: 0;
+  transform: none;
+  background:
+    radial-gradient(60% 50% at 50% 70%, rgba(243, 207, 127, 0.16), transparent 70%),
+    radial-gradient(45% 45% at 88% 12%, rgba(61, 107, 255, 0.2), transparent 70%),
+    radial-gradient(40% 40% at 8% 28%, rgba(70, 90, 210, 0.16), transparent 70%),
+    linear-gradient(180deg, #03050c 0%, #070c1d 45%, #0c1533 82%, #0f1a3c 100%);
+}
+.hero-art .l-stars { --dx: 6; --dy: 4; --ds: 0.04; opacity: 0.95; }
+.hero-art .l-halo { --dx: 10; --dy: 6; --ds: 0.1; animation: halo-breathe 9s ease-in-out infinite; }
+.hero-art .l-far { --dx: 14; --dy: 7; --ds: 0.18; }
+.hero-art .l-rings { --dx: 18; --dy: 9; --ds: 0.22; }
+.hero-art .l-near { --dx: 24; --dy: 10; --ds: 0.3; }
+.hero-art .l-temple { --dx: 30; --dy: 12; --ds: 0.36; filter: drop-shadow(0 0 40px rgba(243, 207, 127, 0.22)); }
+.hero-art .l-fg {
+  --dx: -44;
+  --dy: -10;
+  --ds: -0.1;
+  inset: auto;
+  top: -40px;
+  bottom: -30px;
+  width: clamp(48px, 8.5vw, 150px);
+  filter: blur(1.2px);
+}
+.hero-art .fg-left { left: -1vw; }
+.hero-art .fg-right { right: -1vw; --dx: 44; }
+.hero-art .fg-right svg { transform: scaleX(-1); }
+.hero-art .ring-a,
+.hero-art .ring-b {
+  transform-origin: 800px 600px;
+}
+.hero-art .ring-a { animation: spin-slow 160s linear infinite; }
+.hero-art .ring-b { animation: spin-slow 220s linear infinite reverse; }
+.hero-art .twinkle { animation: twinkle 4.5s ease-in-out infinite; }
+.hero-mist {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 46%;
+  background:
+    radial-gradient(70% 60% at 50% 100%, rgba(120, 150, 255, 0.14), transparent 70%),
+    linear-gradient(0deg, #05070f 0%, rgba(5, 7, 15, 0.82) 22%, rgba(5, 7, 15, 0) 100%);
+}
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(520px circle at calc(50% + var(--px) * 22%) calc(46% + var(--py) * 14%), rgba(243, 207, 127, 0.07), transparent 65%);
+}
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(3, 5, 12, 0.7) 0%, rgba(3, 5, 12, 0) 20%),
+    radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(3, 5, 12, 0.55) 100%);
+}
+.hero-art .shoot {
+  position: absolute;
+  top: 16%;
+  left: 62%;
+  width: 150px;
+  height: 1.5px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff);
+  opacity: 0;
+  transform: rotate(-22deg);
+  animation: shoot 11s ease-in 3s infinite;
+}
+.hero-art .motes i {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 50%;
+  background: #f3cf7f;
+  box-shadow: 0 0 10px 2px rgba(243, 207, 127, 0.6);
+  opacity: 0;
+  animation: mote linear infinite;
+}
+
+.oly .hero-inner {
+  position: relative;
+  z-index: 3;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: calc(var(--header) + clamp(18px, 4.5vh, 56px)) 24px 0;
+}
+.oly .hero-inner > * {
+  animation: rise 1s var(--o-ease) backwards;
+}
+.oly .hero-inner > :nth-child(2) { animation-delay: 0.12s; }
+.oly .hero-inner > :nth-child(3) { animation-delay: 0.26s; }
+.oly .hero-inner > :nth-child(4) { animation-delay: 0.4s; }
+.oly .eyebrow {
+  gap: 9px;
+  padding: 8px 18px;
+  font-size: 11.5px;
+  letter-spacing: 0.26em;
+  color: var(--o-gold);
+  background: rgba(243, 207, 127, 0.07);
+  border: 1px solid rgba(243, 207, 127, 0.32);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 40px rgba(243, 207, 127, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.oly .hero h1 {
+  margin: 22px 0 20px;
+  font-size: clamp(44px, min(8.4vw, 11.2vh), 100px);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  background: var(--o-marble-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 6px 40px rgba(0, 0, 0, 0.55));
+}
+.oly .hero h1 em {
+  display: inline-block;
+  font-style: normal;
+  background: linear-gradient(100deg, #b07a22 0%, #f3cf7f 22%, #fff3cf 40%, #f3cf7f 55%, #d9a441 78%, #b07a22 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gold-sheen 7s ease-in-out infinite;
+}
+.oly .hero p.lead {
+  max-width: 640px;
+  margin: 0 auto 30px;
+  font-size: clamp(16px, 1.5vw, 19px);
+  line-height: 1.6;
+  color: rgba(226, 232, 248, 0.82);
+  text-shadow: 0 2px 24px rgba(3, 5, 12, 0.9);
+}
+.oly .hero-actions {
+  gap: 14px;
+}
+
+/* stats → one floating glass console */
+.oly .stats-row {
+  position: relative;
+  z-index: 3;
+  width: min(1080px, calc(100% - 48px));
+  margin: auto auto 32px;
+  gap: 0;
+  background: none;
+  border: 0;
+  animation: rise 1s var(--o-ease) 0.55s backwards;
+}
+.oly .stats-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: var(--o-glass), rgba(7, 11, 24, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+.oly .stats-row::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  pointer-events: none;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, -40%), rgba(243, 207, 127, 0.14), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.oly .stats-row:hover::after {
+  opacity: 1;
+}
+.oly .stats-row .stat {
+  position: relative;
+  z-index: 1;
+  padding: 20px 14px 18px;
+  background: none;
+}
+.oly .stats-row .stat + .stat::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 24%;
+  bottom: 24%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(243, 207, 127, 0.35), transparent);
+}
+.oly .stats-row .stat b {
+  font-size: clamp(24px, 2.8vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  background: var(--o-gold-metal);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+.oly .stats-row .stat span {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--display);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--o-mute);
+}
+
+/* ------------------------------------------------------------- ticker */
+.oly .ticker {
+  margin-left: calc(-1 * var(--rail));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+  color: #aeb8d0;
+  border-top: 1px solid var(--o-line);
+  border-bottom: 1px solid var(--o-line);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+.oly .ticker-track {
+  padding: 13px 0;
+  gap: 44px;
+}
+.oly .tick a {
+  color: #fff;
+  transition: color 0.2s;
+}
+.oly .tick a:hover {
+  color: var(--o-gold);
+  text-decoration: none;
+}
+.oly .tick .b,
+.oly .tick .s {
+  font-family: var(--display);
+  letter-spacing: 0.1em;
+  font-size: 11px;
+}
+
+/* ------------------------------------------------------------- sections */
+.oly .page {
+  padding: 72px 24px 88px;
+}
+.oly .section {
+  margin-top: 96px;
+}
+.oly .page > :first-child {
+  margin-top: 0;
+}
+.oly .section-head {
+  margin-bottom: 30px;
+}
+.oly .section-head h2 {
+  font-size: clamp(32px, 4.4vw, 52px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  background: var(--o-marble-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.oly .section-head h2::before {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin-bottom: 18px;
+  border-radius: 3px;
+  background: var(--o-gold-metal);
+  box-shadow: 0 0 18px rgba(243, 207, 127, 0.55);
+}
+.oly .section-head .muted {
+  margin-top: 8px;
+  font-size: 14px;
+}
+.oly .ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  max-width: 560px;
+  margin: 96px auto 0;
+}
+.oly .ornament::before,
+.oly .ornament::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(243, 207, 127, 0.55));
+}
+.oly .ornament::after {
+  transform: scaleX(-1);
+}
+.oly .ornament span {
+  width: 9px;
+  height: 9px;
+  transform: rotate(45deg);
+  border: 1px solid var(--o-gold);
+  box-shadow: 0 0 14px rgba(243, 207, 127, 0.7);
+}
+.oly .ornament + .section {
+  margin-top: 64px;
+}
+
+/* scroll reveal */
+.oly .reveal {
+  opacity: 0;
+  transform: translateY(34px);
+  transition: opacity 0.9s var(--o-ease), transform 0.9s var(--o-ease);
+  transition-delay: var(--d, 0ms);
+}
+.oly .reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* toolbar */
+.oly .toolbar {
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.oly .chip {
+  padding: 9px 18px;
+  font-size: 13.5px;
+  color: #c3cbe0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  transition: transform 0.25s var(--o-ease), border-color 0.25s, background 0.25s, color 0.25s, box-shadow 0.25s;
+}
+.oly .chip:hover {
+  color: #fff;
+  transform: translateY(-1px);
+  border-color: rgba(243, 207, 127, 0.5);
+  background: rgba(243, 207, 127, 0.07);
+}
+.oly .chip.on {
+  color: #2a1c05;
+  background: var(--o-gold-metal);
+  border-color: rgba(255, 244, 214, 0.6);
+  box-shadow: 0 6px 22px rgba(217, 164, 65, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.oly .input,
+.oly .select {
+  color: var(--o-ink);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.oly .input::placeholder {
+  color: #7f8aa6;
+}
+.oly .input:focus,
+.oly .select:focus {
+  border-color: rgba(243, 207, 127, 0.65);
+  box-shadow: 0 0 0 4px rgba(243, 207, 127, 0.12);
+}
+.oly .toolbar .input,
+.oly .toolbar .select {
+  padding: 9px 16px;
+}
+.oly .select option {
+  color: #ece7da;
+  background: #0b1226;
+}
+
+/* badges on dark */
+.oly .badge {
+  border: 1px solid transparent;
+  letter-spacing: 0.02em;
+}
+.oly .badge.sol { background: rgba(140, 110, 255, 0.16); color: #c9bbff; border-color: rgba(140, 110, 255, 0.3); }
+.oly .badge.hyp { background: rgba(53, 211, 159, 0.14); color: #6fe9bf; border-color: rgba(53, 211, 159, 0.3); }
+.oly .badge.grad { background: rgba(243, 207, 127, 0.14); color: #f3cf7f; border-color: rgba(243, 207, 127, 0.32); }
+.oly .badge.live { background: rgba(53, 192, 139, 0.14); color: #5fe0a8; border-color: rgba(53, 192, 139, 0.3); }
+.oly .badge.lock { background: rgba(107, 155, 255, 0.14); color: #9db9ff; border-color: rgba(107, 155, 255, 0.32); }
+.oly .badge.neutral { background: rgba(255, 255, 255, 0.07); color: #b9c1d6; border-color: rgba(255, 255, 255, 0.1); }
+
+/* ------------------------------------------------------------- coin cards */
+.oly .coin-grid {
+  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+.oly .coin-card {
+  gap: 14px;
+  padding: 20px;
+  overflow: hidden;
+  color: var(--o-ink);
+  background: var(--o-glass), rgba(9, 13, 28, 0.7);
+  border: 1px solid var(--o-line);
+  border-radius: 22px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 0.4s var(--o-ease), border-color 0.3s, box-shadow 0.4s;
+  animation: card-in 0.7s var(--o-ease) backwards;
+}
+.oly .coin-grid > :nth-child(2) { animation-delay: 0.05s; }
+.oly .coin-grid > :nth-child(3) { animation-delay: 0.1s; }
+.oly .coin-grid > :nth-child(4) { animation-delay: 0.15s; }
+.oly .coin-grid > :nth-child(5) { animation-delay: 0.2s; }
+.oly .coin-grid > :nth-child(6) { animation-delay: 0.25s; }
+.oly .coin-grid > :nth-child(n + 7) { animation-delay: 0.3s; }
+.oly .coin-card::before,
+.oly .king-main::before,
+.oly .step::before,
+.oly .chain-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 0%), rgba(243, 207, 127, 0.14), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.oly .coin-card:hover::before,
+.oly .king-main:hover::before,
+.oly .step:hover::before,
+.oly .chain-card:hover::before {
+  opacity: 1;
+}
+.oly .coin-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(243, 207, 127, 0.48);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 50px rgba(217, 164, 65, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.oly .coin-card.fresh {
+  animation: card-in 0.7s var(--o-ease) backwards, flash 1.6s ease-out;
+}
+.oly .coin-card .name {
+  font-size: 16.5px;
+  color: #fff;
+}
+.oly .coin-card .sym {
+  color: var(--o-mute);
+}
+.oly .coin-card .desc {
+  color: #a9b3ca;
+  line-height: 1.55;
+}
+.oly .coin-card .meta div {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+.oly .coin-card .meta small {
+  color: var(--o-mute);
+}
+.oly .coin-card .meta b {
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.oly .coin-card .meta b.up { color: var(--green); }
+.oly .coin-card .meta b.down { color: var(--red); }
+.oly .progress {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.oly .progress > i {
+  background: var(--o-gold-metal);
+  box-shadow: 0 0 14px rgba(243, 207, 127, 0.5);
+}
+.oly .progress.green > i {
+  background: linear-gradient(90deg, #35c08b, #7df0c3);
+  box-shadow: 0 0 14px rgba(79, 224, 168, 0.45);
+}
+.oly .avatar {
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+.oly .skeleton {
+  height: 250px !important;
+  border: 1px solid var(--o-line);
+  border-radius: 22px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.035) 25%, rgba(255, 255, 255, 0.09) 50%, rgba(255, 255, 255, 0.035) 75%);
+  background-size: 200% 100%;
+}
+.oly .notice.red {
+  color: #ffb3b9;
+  background: rgba(255, 107, 117, 0.1);
+  border-color: rgba(255, 107, 117, 0.3);
+}
+.oly .linkish {
+  color: var(--o-gold);
+}
+.oly .empty.card {
+  padding: 72px 24px;
+  background: var(--o-glass), rgba(9, 13, 28, 0.6);
+  border: 1px dashed rgba(243, 207, 127, 0.28);
+  border-radius: 24px;
+  box-shadow: none;
+}
+.oly .empty h3 {
+  color: #fff;
+  font-size: 26px;
+}
+.oly .empty p {
+  max-width: 480px;
+  margin: 0 auto 22px;
+  color: var(--o-mute);
+}
+
+/* ------------------------------------------------------------- king of the hill */
+.oly .king {
+  gap: 20px;
+}
+.oly .king-main {
+  padding: 30px;
+  border-radius: 26px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(243, 207, 127, 0.16), transparent 55%),
+    linear-gradient(150deg, rgba(30, 44, 90, 0.7), rgba(7, 11, 24, 0.92));
+  border: 1px solid rgba(243, 207, 127, 0.4);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.5), 0 0 70px rgba(217, 164, 65, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  transition: transform 0.4s var(--o-ease), box-shadow 0.4s;
+}
+.oly .king-main:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 50px 100px rgba(0, 0, 0, 0.55), 0 0 90px rgba(217, 164, 65, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.oly .king-main::after {
+  right: -60px;
+  top: -80px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(243, 207, 127, 0.22), transparent 65%);
+}
+.oly .king-main .crown {
+  font-size: 11.5px;
+  letter-spacing: 0.28em;
+  color: var(--o-gold);
+}
+.oly .king-main .big {
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.oly .king-laurel {
+  position: absolute;
+  right: -52px;
+  bottom: -44px;
+  z-index: 0;
+  width: 230px;
+  height: 230px;
+  opacity: 0.34;
+  pointer-events: none;
+  transition: opacity 0.4s, transform 0.8s var(--o-ease);
+}
+.oly .king-main > :not(.king-laurel):not(.cover) {
+  position: relative;
+  z-index: 1;
+}
+.oly .king-main:hover .king-laurel {
+  opacity: 0.55;
+  transform: rotate(-6deg) scale(1.05);
+}
+
+/* ------------------------------------------------------------- how it works / chains */
+.oly .steps {
+  gap: 20px;
+}
+.oly .step,
+.oly .chain-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--o-glass), rgba(9, 13, 28, 0.66);
+  border: 1px solid var(--o-line);
+  border-radius: 26px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  transition: transform 0.45s var(--o-ease), border-color 0.3s, box-shadow 0.45s;
+}
+.oly .step:hover,
+.oly .chain-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(243, 207, 127, 0.4);
+  box-shadow: 0 34px 80px rgba(0, 0, 0, 0.5), 0 0 50px rgba(217, 164, 65, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.oly .step {
+  padding: 34px 30px 32px;
+}
+.oly .step .n {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 22px;
+  font-size: 24px;
+  color: var(--o-gold);
+  background: none;
+}
+.oly .step .n-laurel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 8px rgba(243, 207, 127, 0.35));
+  transition: transform 0.8s var(--o-ease);
+}
+.oly .step:hover .n-laurel {
+  transform: rotate(8deg) scale(1.08);
+}
+.oly .step .n span {
+  position: relative;
+  font-family: var(--display);
+  font-weight: 700;
+  background: var(--o-gold-metal);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.oly .step h3 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+.oly .step p {
+  color: #a9b3ca;
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+.oly .chain-card {
+  padding: 32px 30px;
+  --accent: 140, 110, 255;
+}
+.oly .chain-card:nth-child(2) {
+  --accent: 53, 211, 159;
+}
+.oly .chain-card::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 180px;
+  pointer-events: none;
+  background: radial-gradient(60% 100% at 20% 0%, rgba(var(--accent), 0.2), transparent 70%);
+}
+.oly .chain-card > * {
+  position: relative;
+  z-index: 1;
+}
+.oly .chain-card h3 {
+  font-size: 26px !important;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: #fff;
+}
+.oly .chain-card .muted {
+  line-height: 1.6;
+  font-size: 14px;
+}
+.oly .chain-card ul {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #c5cde0;
+}
+.oly .chain-card li {
+  position: relative;
+  margin: 0;
+  padding: 11px 0 11px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.oly .chain-card li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 19px;
+  width: 6px;
+  height: 6px;
+  transform: rotate(45deg);
+  background: var(--o-gold-metal);
+  box-shadow: 0 0 8px rgba(243, 207, 127, 0.6);
+}
+
+/* ------------------------------------------------------------- closing call to action */
+.oly .cta-band {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: 120px;
+  padding: 104px 24px 96px;
+  border-radius: 36px;
+  border: 1px solid rgba(243, 207, 127, 0.3);
+  background:
+    radial-gradient(70% 90% at 50% 125%, rgba(243, 207, 127, 0.3), transparent 70%),
+    radial-gradient(50% 60% at 12% 0%, rgba(80, 120, 255, 0.2), transparent 70%),
+    linear-gradient(180deg, #0b1332, #060a18);
+  box-shadow: 0 60px 140px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.oly .cta-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 100%), rgba(243, 207, 127, 0.1), transparent 60%);
+  pointer-events: none;
+}
+.oly .cta-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  opacity: 0.85;
+}
+.oly .cta-band > :not(.cta-art) {
+  position: relative;
+}
+.oly .cta-laurel {
+  display: block;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 22px;
+  filter: drop-shadow(0 0 14px rgba(243, 207, 127, 0.45));
+}
+.oly .cta-band h2 {
+  margin-bottom: 14px;
+  font-size: clamp(36px, 5.6vw, 68px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  background: var(--o-marble-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.oly .cta-band p {
+  max-width: 540px;
+  margin: 0 auto 34px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: rgba(226, 232, 248, 0.78);
+}
+
+/* ------------------------------------------------------------- footer */
+html.olympus .footer {
+  position: relative;
+  margin: 24px 0 0 calc(-1 * var(--rail));
+  padding: 84px 24px 56px calc(24px + var(--rail));
+  color: var(--o-mute);
+  text-align: center;
+  font-size: 12.5px;
+  line-height: 1.75;
+  border-top: 0;
+  background: linear-gradient(180deg, rgba(5, 7, 15, 0), rgba(8, 12, 26, 0.9) 45%, var(--o-bg));
+}
+html.olympus .footer::before {
+  content: '';
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  width: min(520px, 80%);
+  height: 14px;
+  transform: translateX(-50%);
+  background: var(--meander) repeat-x center;
+  opacity: 0.55;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
+}
+html.olympus .footer .links {
+  gap: 34px;
+  margin-bottom: 22px;
+}
+html.olympus .footer .links a {
+  position: relative;
+  padding: 6px 0;
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #d9dfee;
+  transition: color 0.25s;
+}
+html.olympus .footer .links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--o-gold-metal);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.4s var(--o-ease);
+}
+html.olympus .footer .links a:hover {
+  color: var(--o-gold);
+  text-decoration: none;
+}
+html.olympus .footer .links a:hover::after {
+  transform: scaleX(1);
+}
+html.olympus .footer > div:last-child {
+  max-width: 780px;
+  margin: 0 auto;
+}
+html.olympus .footer b {
+  color: #d9dfee;
+}
+
+/* ------------------------------------------------------------- motion */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(26px); filter: blur(8px); }
+}
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(22px); }
+}
+@keyframes gold-sheen {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+@keyframes halo-breathe {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+@keyframes mote {
+  0% { opacity: 0; transform: translate(0, 0); }
+  12% { opacity: 0.8; }
+  85% { opacity: 0.5; }
+  100% { opacity: 0; transform: translate(var(--drift, 0), -70vh); }
+}
+@keyframes shoot {
+  0%, 92% { opacity: 0; transform: translate(0, 0) rotate(-22deg); }
+  93% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-260px, 110px) rotate(-22deg); }
+}
+
+/* ------------------------------------------------------------- responsive */
+@media (max-width: 1100px) {
+  .oly .stats-row .stat span { letter-spacing: 0.16em; }
+}
+@media (max-width: 900px) {
+  .oly .hero,
+  .oly .ticker { margin-left: 0; }
+  html.olympus .footer { margin-left: 0; padding-left: 24px; }
+  .oly .page { padding: 56px 18px 72px; }
+  .oly .section { margin-top: 72px; }
+  .oly .ornament { margin-top: 72px; }
+  .oly .cta-band { margin-top: 88px; padding: 80px 20px 72px; border-radius: 28px; }
+  .oly .king-main { padding: 24px; }
+  .oly .king-laurel { width: 170px; height: 170px; right: -40px; bottom: -36px; opacity: 0.24; }
+  html.olympus .footer { padding-bottom: 96px; }
+}
+@media (max-width: 640px) {
+  .oly .hero { min-height: max(700px, 100svh); }
+  .oly .hero-inner { padding-left: 20px; padding-right: 20px; }
+  .oly .hero-actions .btn { width: 100%; max-width: 340px; }
+  .oly .stats-row { width: calc(100% - 28px); margin-bottom: 24px; }
+  .oly .stats-row .stat { padding: 20px 8px 18px; }
+  .oly .stats-row .stat:nth-child(3)::before { display: none; }
+  .oly .stats-row .stat:nth-child(n + 3) { border-top: 1px solid rgba(255, 255, 255, 0.07); }
+  .oly .coin-grid { grid-template-columns: 1fr; }
+  .oly .toolbar .input { max-width: none; }
+  .oly .step { padding: 28px 24px; }
+  .oly .chain-card { padding: 26px 22px; }
+  .hero-art .l-fg { width: 40px; }
+  .hero-art .shoot { display: none; }
+  html.olympus .footer .links { gap: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oly .reveal { opacity: 1; transform: none; }
+  .oly .hero-inner > *,
+  .oly .stats-row,
+  .oly .coin-card { animation: none !important; }
+  .hero-art .motes,
+  .hero-art .shoot { display: none; }
+}

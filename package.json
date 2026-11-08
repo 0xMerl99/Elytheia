@@ -1,0 +1,56 @@
+{
+  "name": "elytheia",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Elytheia - a multichain token launchpad (Solana via pump.fun + HyperEVM)",
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c yellow,cyan \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "tsx watch server/index.ts",
+    "dev:client": "vite",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "start": "cross-env NODE_ENV=production tsx server/index.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "chain:e2e": "tsx scripts/chain-e2e.ts",
+    "contracts:test": "cd contracts && forge test",
+    "contracts:abi": "cd contracts && forge build && cd .. && node scripts/export-abi.mjs",
+    "chain:test": "node scripts/chain-e2e-run.mjs",
+    "pump:simulate": "tsx scripts/pump-simulate.ts",
+    "chain:dev": "node scripts/chain-dev.mjs",
+    "contracts:deps": "cd contracts && forge install --no-git foundry-rs/forge-std@v1.17.0 OpenZeppelin/openzeppelin-contracts@v5.7.0 Uniswap/v4-core@v4.0.0",
+    "contracts:test:v4": "cd contracts && cross-env FOUNDRY_PROFILE=v4 forge test --match-path \"test-v4/*\""
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.99.0",
+    "better-sqlite3": "^13.0.3",
+    "bs58": "^6.0.0",
+    "buffer": "^6.0.3",
+    "cross-env": "^10.1.0",
+    "express": "^5.3.0",
+    "helmet": "^8.3.0",
+    "lightweight-charts": "^5.2.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.5",
+    "tsx": "^4.23.15",
+    "tweetnacl": "^1.0.3",
+    "viem": "^2.57.16",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "concurrently": "^10.0.7",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

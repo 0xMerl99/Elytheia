@@ -1,0 +1,25 @@
+node_modules
+dist
+
+# local runtime data: the database, uploaded images, published coin metadata, cached prices
+data/
+data-real/
+
+# environment and private keys: never commit
+.env
+.secrets
+*.key
+
+# Foundry build output, local broadcast logs and the (large, re-installable) contract libraries
+contracts/out
+contracts/cache
+contracts/out-v4
+contracts/cache-v4
+contracts/broadcast
+contracts/lib
+
+# editor / OS / tool noise
+.claude/
+.vscode/
+.DS_Store
+*.log
