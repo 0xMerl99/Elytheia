@@ -164,6 +164,24 @@ The browser builds and signs transactions with the user's wallet. The indexers r
 After a transaction confirms the browser calls `/api/chain/sync` so the UI updates immediately; otherwise the indexers
 poll every few seconds. Every pump.fun transaction is **dry-run against the real program before the wallet prompt**.
 
+## Deploy to Render
+
+`render.yaml` is a Render blueprint: one Node web service that builds the site (`npm ci --include=dev && npm run build`) and runs
+`npm start`, with a **persistent disk** mounted at `/var/data` (`DATA_DIR`).
+
+1. Render dashboard -> **New** -> **Blueprint** -> pick this GitHub repo. Render reads `render.yaml`.
+2. Fill the two secrets it asks for: `PUBLIC_URL` (the site's final **https** address) and `SOL_RPC_URL` (a dedicated Solana RPC;
+   the public one rate-limits hard). `TOKEN_CA` is optional (the project's own token, shown on the landing page).
+3. After the first deploy, set `PUBLIC_URL` to the address you will keep and redeploy. Prefer your own domain: **coin metadata links
+   are written into the blockchain permanently**, so a coin launched while `PUBLIC_URL` is wrong or temporary points at a dead address
+   for good. The server prints a warning at start-up while `PUBLIC_URL` is not https.
+
+Why not Render's free plan: its filesystem is wiped on every deploy and spin-down, which would delete the database and, worse, the
+image and metadata files that launched coins point to. The disk needs a paid instance type. Keep the disk's daily snapshots on.
+
+The database is a mirror of public chain data: on a fresh disk the Elysium indexer rebuilds coins, trades and holders from
+`HYP_START_BLOCK`. Solana coins are added by launching on the site or by pasting a mint into the search bar.
+
 ## Going live safely
 
 1. **Audit the contract** before real users trust it with funds: [`contracts/README.md`](contracts/README.md) lists the
