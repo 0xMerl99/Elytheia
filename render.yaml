@@ -47,8 +47,9 @@ services:
       - key: SOL_RPC_URL
         sync: false
 
-      # the project's own token (Solana mint) shown on the landing screen; leave empty until you have one
+      # the project's own token (Solana mint), shown on the landing screen with a Copy button and a pump.fun link.
+      # It is public information, so it lives here rather than as a dashboard secret.
       - key: TOKEN_CA
-        sync: false
+        value: GcyAQDqv2HN4wxeJnmQ19u9CCcPvgKBJ9GK2SRPYpump
       - key: X_URL
         value: https://x.com/useelytheia
