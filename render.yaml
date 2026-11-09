@@ -52,4 +52,4 @@ services:
       - key: TOKEN_CA
         value: GcyAQDqv2HN4wxeJnmQ19u9CCcPvgKBJ9GK2SRPYpump
       - key: X_URL
-        value: https://x.com/useelytheia
+        value: https://x.com/elyonpad

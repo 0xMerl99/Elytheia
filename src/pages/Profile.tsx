@@ -4,7 +4,7 @@ import { useApp } from '../lib/app';
 import { useFetch } from '../lib/useFetch';
 import type { Profile } from '../lib/types';
 import { clsx, copyText, fmtCompact, fmtNum, fmtPct, fmtQuote, fmtUsd, shortAddr, timeAgo } from '../lib/format';
-import { ChainBadge, CoinAvatar } from '../components/Brand';
+import { BRAND, ChainBadge, CoinAvatar } from '../components/Brand';
 import { CoinCard } from '../components/CoinCard';
 import { ICopy, IWallet } from '../components/Icons';
 import { NotFound } from './NotFound';
@@ -52,15 +52,15 @@ export default function ProfilePage() {
   const [tab, setTab] = useState<Tab>('holdings');
 
   useEffect(() => {
-    document.title = 'Portfolio | Elytheia';
+    document.title = `Portfolio | ${BRAND}`;
   }, []);
 
   if (!address) {
     if (booting) return <div className="page"><div className="skeleton" style={{ height: 200 }} /></div>;
     return (
       <div className="page empty-page">
-        <IWallet size={40} />
-        <h2 style={{ marginTop: 12 }}>Your portfolio</h2>
+        <IWallet size={44} />
+        <h2 style={{ marginTop: 14 }}>Your portfolio</h2>
         <p className="muted">Connect a wallet to see your holdings, launches and rewards.</p>
         <button className="btn gold lg" onClick={() => openConnect()}>Connect wallet</button>
       </div>
@@ -72,9 +72,9 @@ export default function ProfilePage() {
       return (
         <div className="page empty-page">
           <h2>{own ? 'Nothing here yet' : 'No activity for this wallet'}</h2>
-          <p className="muted">{own ? 'Make a trade or launch a coin and it will show up here.' : 'This wallet has not traded or launched anything.'}</p>
+          <p className="muted">{own ? 'Make a trade or launch a token and it will show up here.' : 'This wallet has not traded or launched anything.'}</p>
           <p className="mono small muted">{address}</p>
-          <Link to="/home#coins" className="btn gold">Explore coins</Link>
+          <Link to="/home" className="btn gold">Back to home</Link>
         </div>
       );
     }
@@ -87,12 +87,12 @@ export default function ProfilePage() {
   return (
     <div className="page">
       <div className="profile-head">
-        <span className="avatar round" style={{ width: 60, height: 60, background: `linear-gradient(145deg, #d9a441, #0b1226)`, fontSize: 24 }}>
+        <span className="avatar round" style={{ width: 60, height: 60, background: `linear-gradient(145deg, #e0a93a, #0f3a45)`, fontSize: 22 }}>
           {data.address.slice(0, 2)}
         </span>
         <div className="grow">
           <h2 style={{ margin: 0 }}>{own ? 'Your portfolio' : 'Wallet'}</h2>
-          <div className="row gap-sm small muted">
+          <div className="row gap-sm wrap small muted">
             <span className="mono">{shortAddr(data.address, 8, 8)}</span>
             <button className="copy" aria-label="Copy address" onClick={async () => toast((await copyText(data.address)) ? 'Address copied' : 'Copy failed')}><ICopy size={12} /></button>
             <span>· joined {timeAgo(data.joinedAt)}</span>
@@ -104,12 +104,12 @@ export default function ProfilePage() {
         <div className="s"><small>Holdings value</small><b>{fmtUsd(data.stats.holdingsUsd)}</b></div>
         <div className="s"><small>Profit / loss</small><b className={data.stats.pnlUsd >= 0 ? 'up' : 'down'}>{data.stats.pnlUsd >= 0 ? '+' : ''}{fmtUsd(data.stats.pnlUsd)}</b></div>
         <div className="s"><small>Claimable rewards</small><b>{fmtUsd(data.stats.claimableUsd, { precise: true })}</b></div>
-        <div className="s"><small>Coins launched</small><b>{data.stats.coinsCreated}</b></div>
+        <div className="s"><small>Tokens launched</small><b>{data.stats.coinsCreated}</b></div>
       </div>
 
       {own && claimableCoins.length > 0 && (
         <div className="notice green" style={{ marginBottom: 16 }}>
-          You have rewards waiting on {claimableCoins.length} coin{claimableCoins.length > 1 ? 's' : ''}. Claim them from the Holdings tab.
+          You have rewards waiting on {claimableCoins.length} token{claimableCoins.length > 1 ? 's' : ''}. Claim them from the Holdings tab.
         </div>
       )}
 
@@ -121,31 +121,31 @@ export default function ProfilePage() {
 
       {tab === 'holdings' && (
         data.holdings.length === 0 ? (
-          <div className="empty card"><h3>No holdings</h3><p>Coins you buy will appear here.</p><Link to="/home#coins" className="btn gold">Find a coin</Link></div>
+          <div className="empty card"><h3>No holdings</h3><p>Tokens you buy will appear here.</p><Link to="/home" className="btn gold">Back to home</Link></div>
         ) : (
-          <div className="card table-wrap" style={{ padding: 6 }}>
-            <table className="table">
+          <div className="card table-wrap table-card">
+            <table className="table stack">
               <thead>
-                <tr><th>Coin</th><th className="num">Balance</th><th className="num">Value</th><th className="num">P/L</th><th className="num">Rewards</th>{own && <th />}</tr>
+                <tr><th>Token</th><th className="num">Balance</th><th className="num">Value</th><th className="num">P/L</th><th className="num">Rewards</th>{own && <th />}</tr>
               </thead>
               <tbody>
                 {data.holdings.map((h) => (
                   <tr key={h.coin.id}>
-                    <td>
+                    <td data-label="" className="full">
                       <Link to={`/coin/${h.coin.id}`} className="row gap-sm">
-                        <CoinAvatar coin={h.coin} size={32} />
-                        <span><b>{h.coin.name}</b> <span className="muted">${h.coin.symbol}</span><br /><ChainBadge chain={h.coin.chain} /></span>
+                        <CoinAvatar coin={h.coin} size={36} />
+                        <span><b>{h.coin.name}</b> <span className="muted mono">${h.coin.symbol}</span><br /><ChainBadge chain={h.coin.chain} /></span>
                       </Link>
                     </td>
-                    <td className="num">{fmtCompact(h.amount)}</td>
-                    <td className="num">{fmtUsd(h.valueUsd, { precise: true })}</td>
-                    <td className={clsx('num', h.pnlUsd >= 0 ? 'up' : 'down')}>
+                    <td data-label="Balance" className="num">{fmtCompact(h.amount)}</td>
+                    <td data-label="Value" className="num">{fmtUsd(h.valueUsd, { precise: true })}</td>
+                    <td data-label="P/L" className={clsx('num', h.pnlUsd >= 0 ? 'up' : 'down')}>
                       {h.pnlUsd >= 0 ? '+' : ''}{fmtUsd(h.pnlUsd, { precise: true })}
                       <div className="xs muted">{h.boughtQuote > 0 ? fmtPct((h.pnlQuote / h.boughtQuote) * 100) : ''}</div>
                     </td>
-                    <td className="num">{h.claimableQuote > 0 ? fmtQuote(h.claimableQuote, h.coin.quote, 5) : <span className="muted">–</span>}</td>
+                    <td data-label="Rewards" className="num">{h.claimableQuote > 0 ? fmtQuote(h.claimableQuote, h.coin.quote, 5) : <span className="muted">–</span>}</td>
                     {own && (
-                      <td className="num">
+                      <td data-label="" className="num full">
                         <ClaimButton coin={h.coin} amount={h.claimableQuote} onDone={() => reload(true)} />
                       </td>
                     )}
@@ -153,8 +153,8 @@ export default function ProfilePage() {
                 ))}
               </tbody>
             </table>
-            <p className="xs muted" style={{ margin: '8px 10px 6px' }}>
-              P/L is based on this wallet's trades on this site; coins moved between wallets aren't counted.
+            <p className="xs muted" style={{ margin: '10px 12px 4px' }}>
+              P/L is based on this wallet's trades on this site; tokens moved between wallets aren't counted.
             </p>
           </div>
         )
@@ -162,9 +162,9 @@ export default function ProfilePage() {
 
       {tab === 'created' && (
         data.created.length === 0 ? (
-          <div className="empty card"><h3>No launches yet</h3>{own && <Link to="/create" className="btn gold">Launch a coin</Link>}</div>
+          <div className="empty card"><h3>No launches yet</h3>{own && <Link to="/create" className="btn gold">Launch a token</Link>}</div>
         ) : (
-          <div className="coin-grid">{data.created.map((c) => <CoinCard key={c.id} coin={c} />)}</div>
+          <div className="token-grid">{data.created.map((c) => <CoinCard key={c.id} coin={c} />)}</div>
         )
       )}
 
@@ -172,17 +172,17 @@ export default function ProfilePage() {
         data.trades.length === 0 ? (
           <div className="empty card"><h3>No trades yet</h3></div>
         ) : (
-          <div className="card table-wrap" style={{ padding: 6 }}>
-            <table className="table">
-              <thead><tr><th>When</th><th>Type</th><th>Coin</th><th className="num">Amount</th><th className="num">USD</th></tr></thead>
+          <div className="card table-wrap table-card">
+            <table className="table stack">
+              <thead><tr><th>When</th><th>Type</th><th>Token</th><th className="num">Amount</th><th className="num">USD</th></tr></thead>
               <tbody>
                 {data.trades.map((t) => (
                   <tr key={t.id}>
-                    <td className="muted">{timeAgo(t.createdAt)}</td>
-                    <td className={t.side === 'buy' ? 'up' : 'down'} style={{ fontWeight: 700 }}>{t.side === 'buy' ? 'Buy' : 'Sell'}</td>
-                    <td><Link to={`/coin/${t.coin.id}`} className="row gap-sm"><CoinAvatar coin={t.coin} size={24} /> ${t.coin.symbol}</Link></td>
-                    <td className="num">{fmtNum(t.quote, 4)} {t.quoteSymbol}</td>
-                    <td className="num">{fmtUsd(t.usd, { precise: true })}</td>
+                    <td data-label="When" className="muted">{timeAgo(t.createdAt)}</td>
+                    <td data-label="Type" className={t.side === 'buy' ? 'up' : 'down'} style={{ fontWeight: 700 }}>{t.side === 'buy' ? 'Buy' : 'Sell'}</td>
+                    <td data-label="Token"><Link to={`/coin/${t.coin.id}`} className="row gap-sm"><CoinAvatar coin={t.coin} size={24} /> <span className="mono">${t.coin.symbol}</span></Link></td>
+                    <td data-label="Amount" className="num">{fmtNum(t.quote, 4)} {t.quoteSymbol}</td>
+                    <td data-label="USD" className="num">{fmtUsd(t.usd, { precise: true })}</td>
                   </tr>
                 ))}
               </tbody>

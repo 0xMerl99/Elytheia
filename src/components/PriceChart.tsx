@@ -37,25 +37,25 @@ export function PriceChart({ coinId, quote, refreshKey }: { coinId: string; quot
     if (!el.current) return;
     const c = createChart(el.current, {
       autoSize: true,
-      layout: { background: { type: ColorType.Solid, color: 'transparent' }, textColor: '#7b7468', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12 },
-      grid: { vertLines: { color: '#f1ece1' }, horzLines: { color: '#f1ece1' } },
-      crosshair: { mode: CrosshairMode.Normal },
-      rightPriceScale: { borderColor: '#e7e1d5', scaleMargins: { top: 0.08, bottom: 0.22 } },
-      timeScale: { borderColor: '#e7e1d5', timeVisible: true, secondsVisible: false, rightOffset: 4 },
+      layout: { background: { type: ColorType.Solid, color: 'transparent' }, textColor: '#8fa3a6', fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 12 },
+      grid: { vertLines: { color: 'rgba(248,247,244,0.05)' }, horzLines: { color: 'rgba(248,247,244,0.05)' } },
+      crosshair: { mode: CrosshairMode.Normal, vertLine: { color: 'rgba(52,183,221,0.5)', labelBackgroundColor: '#163b44' }, horzLine: { color: 'rgba(52,183,221,0.5)', labelBackgroundColor: '#163b44' } },
+      rightPriceScale: { borderColor: 'rgba(248,247,244,0.1)', scaleMargins: { top: 0.08, bottom: 0.22 } },
+      timeScale: { borderColor: 'rgba(248,247,244,0.1)', timeVisible: true, secondsVisible: false, rightOffset: 4 },
       handleScale: { axisPressedMouseMove: true },
     });
     candleSeries.current = c.addSeries(CandlestickSeries, {
-      upColor: '#1f9d6b',
-      downColor: '#d24b54',
-      wickUpColor: '#1f9d6b',
-      wickDownColor: '#d24b54',
+      upColor: '#3ddc97',
+      downColor: '#ff6b72',
+      wickUpColor: '#3ddc97',
+      wickDownColor: '#ff6b72',
       borderVisible: false,
       priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
     });
     volSeries.current = c.addSeries(HistogramSeries, {
       priceFormat: { type: 'volume' },
       priceScaleId: 'vol',
-      color: '#d9a44155',
+      color: '#e0a93a55',
     });
     c.priceScale('vol').applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
     chart.current = c;
@@ -94,7 +94,7 @@ export function PriceChart({ coinId, quote, refreshKey }: { coinId: string; quot
           r.candles.map((c) => ({
             time: c.time as UTCTimestamp,
             value: c.volume,
-            color: c.close >= c.open ? '#1f9d6b44' : '#d24b5444',
+            color: c.close >= c.open ? '#3ddc9744' : '#ff6b7244',
           })),
         );
         if (!fitted.current && r.candles.length) {
@@ -115,7 +115,7 @@ export function PriceChart({ coinId, quote, refreshKey }: { coinId: string; quot
           </button>
         ))}
         <span className="right" />
-        <div className="seg" style={{ minWidth: 150 }} role="group" aria-label="Chart units">
+        <div className="seg" style={{ minWidth: 150, marginLeft: 'auto' }} role="group" aria-label="Chart units">
           <button className={clsx(unit === 'usd' && 'on')} onClick={() => setUnit('usd')}>USD</button>
           <button className={clsx(unit === 'quote' && 'on')} onClick={() => setUnit('quote')}>{quote}</button>
         </div>
@@ -124,7 +124,7 @@ export function PriceChart({ coinId, quote, refreshKey }: { coinId: string; quot
         <div ref={el} style={{ position: 'absolute', inset: 0 }} />
         {count === 0 && <div className="chart-empty">No trades yet</div>}
       </div>
-      <div className="xs muted" style={{ padding: '6px 4px 4px' }}>Market cap · candles are built from this coin's trades.</div>
+      <div className="xs muted" style={{ padding: '8px 4px 4px' }}>Market cap · candles are built from this token's trades.</div>
     </div>
   );
 }

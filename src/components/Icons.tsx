@@ -54,6 +54,11 @@ export const IBolt = make(<path d="M13 2L4 14h7l-1 8 9-12h-7z" />);
 export const IUsers = make(<><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" /><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2 .6 3.5 2.4 3.5 6" /></>);
 export const IDownload = make(<><path d="M12 4v11" /><path d="M7 11l5 5 5-5" /><path d="M5 20h14" /></>);
 export const IPlus = make(<path d="M12 5v14M5 12h14" />);
+export const IList = make(<><path d="M8 6h13M8 12h13M8 18h13" /><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01" /></>);
+export const IArrowRight = make(<path d="M5 12h14M13 6l6 6-6 6" />);
+export const ICompass = make(<><circle cx="12" cy="12" r="9" /><path d="M15.5 8.5l-2 5-5 2 2-5z" /></>);
+export const IChevRight = make(<path d="M9 6l6 6-6 6" />);
+export const ILayers = make(<><path d="M12 3l9 5-9 5-9-5z" /><path d="M3 13l9 5 9-5" /></>);
 
 export const IconX = make(<path d="M3 3h4.6l4.4 6 5.2-6H21l-7.4 8.4L21 21h-4.6l-4.7-6.3L6.3 21H3l7.8-8.8z" />, true);
 export const IconTelegram = make(<path d="M21.5 3.2L2.7 10.6c-.9.4-.9 1.2-.2 1.4l4.8 1.5 1.9 5.8c.2.6.4.7.9.7.4 0 .6-.2.9-.4l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8L22.8 4.6c.3-1.3-.5-1.8-1.3-1.4zM9 13.3l9.3-5.9c.4-.3.8 0 .5.2l-7.6 6.9-.3 3.2z" />, true);

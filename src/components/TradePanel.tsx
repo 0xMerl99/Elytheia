@@ -81,7 +81,7 @@ export function TradePanel({ coin, onTraded, meRefreshKey }: { coin: Coin; onTra
     try {
       const r = await ad.execute(side, amt, pct, quote, slip);
       toast(r.message, 'ok');
-      if (r.graduated) toast(`🎓 $${coin.symbol} just graduated to the AMM!`, 'ok');
+      if (r.graduated) toast(`$${coin.symbol} just graduated to the AMM!`, 'ok');
       setAmount('');
       setPct(undefined);
       setQuote(null);
@@ -120,9 +120,9 @@ export function TradePanel({ coin, onTraded, meRefreshKey }: { coin: Coin; onTra
         <span>
           {ad.ready ? (
             side === 'buy' ? (
-              <>Balance: <b style={{ color: 'var(--ink)' }}>{fmtNum(balance, 4)} {info.quote}</b></>
+              <>Balance: <b className="strong">{fmtNum(balance, 4)} {info.quote}</b></>
             ) : (
-              <>Holding: <b style={{ color: 'var(--ink)' }}>{fmtCompact(held)} ${coin.symbol}</b></>
+              <>Holding: <b className="strong">{fmtCompact(held)} ${coin.symbol}</b></>
             )
           ) : (
             'Not connected'
@@ -196,7 +196,7 @@ export function TradePanel({ coin, onTraded, meRefreshKey }: { coin: Coin; onTra
           )}
         </div>
       )}
-      {quote?.graduates && <div className="notice green small" style={{ marginBottom: 10 }}>🎓 This buy fills the bonding curve and graduates ${coin.symbol} to a locked AMM pool.</div>}
+      {quote?.graduates && <div className="notice green small" style={{ marginBottom: 10 }}>This buy fills the bonding curve and graduates ${coin.symbol} to a locked AMM pool.</div>}
       {quote?.warning && <div className="notice small" style={{ marginBottom: 10 }}>{quote.warning}</div>}
       {feeNote && !quote?.warning && <div className="notice small" style={{ marginBottom: 10 }}>{feeNote}</div>}
       {ad.note && <div className="xs muted" style={{ marginBottom: 10 }}>{ad.note}</div>}

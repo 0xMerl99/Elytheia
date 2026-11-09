@@ -69,7 +69,7 @@ function cleanCa(raw: string | undefined): string {
 }
 
 function cleanXUrl(raw: string | undefined): string {
-  const fallback = 'https://x.com/useelytheia';
+  const fallback = 'https://x.com/elyonpad';
   try {
     const u = new URL((raw || '').trim() || fallback);
     const host = u.hostname.toLowerCase();

@@ -36,7 +36,7 @@ export function normalizeAddress(addr: string): string {
 
 export function loginMessage(address: string, nonce: string, issuedAt: string): string {
   return [
-    'Sign in to Elytheia',
+    'Sign in to ELYONPAD',
     '',
     'This signature proves you own this wallet. It does not trigger a transaction or cost anything.',
     '',

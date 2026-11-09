@@ -6,7 +6,7 @@ import { useFetch } from '../lib/useFetch';
 import { useNow, useStream } from '../lib/stream';
 import type { Coin, CommentItem, Holder, Trade } from '../lib/types';
 import { clsx, copyText, fmtCompact, fmtNum, fmtPct, fmtPrice, fmtQuote, fmtUsd, shortAddr, timeAgo } from '../lib/format';
-import { ChainBadge, CoinAvatar, StatusBadge } from '../components/Brand';
+import { BRAND, ChainBadge, CoinAvatar, StatusBadge } from '../components/Brand';
 import { IArrowLeft, ICheck, ICopy, IExt, IGlobe, IconTelegram, IconX, ILock } from '../components/Icons';
 import { PriceChart } from '../components/PriceChart';
 import { TradePanel } from '../components/TradePanel';
@@ -53,13 +53,13 @@ export default function CoinPage() {
 
   const coin = data?.coin;
   useEffect(() => {
-    if (coin) document.title = `${coin.name} ($${coin.symbol}) | Elytheia`;
+    if (coin) document.title = `${coin.name} ($${coin.symbol}) | ${BRAND}`;
   }, [coin?.name, coin?.symbol]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (error && !data) {
-    return /not found/i.test(error) ? <NotFound what="coin" /> : (
+    return /not found/i.test(error) ? <NotFound what="token" /> : (
       <div className="page empty-page">
-        <h3>Couldn't load this coin</h3>
+        <h3>Couldn't load this token</h3>
         <p className="muted">{error}</p>
         <button className="btn ghost" onClick={() => reload()}>Try again</button>
       </div>
@@ -83,18 +83,18 @@ export default function CoinPage() {
   return (
     <div className="page">
       <div className="crumbs">
-        <Link to="/home#coins" className="row gap-sm muted"><IArrowLeft size={15} /> Back to coins</Link>
+        <Link to="/home" className="back-link"><IArrowLeft size={15} /> Back to home</Link>
       </div>
 
       <div className="coin-head">
         <CoinAvatar coin={coin} size={64} />
         <div className="grow">
           <div className="row gap wrap">
-            <h1>{coin.name} <span className="muted" style={{ fontWeight: 600 }}>${coin.symbol}</span></h1>
+            <h1>{coin.name} <span className="muted mono" style={{ fontWeight: 600, fontSize: '0.62em' }}>${coin.symbol}</span></h1>
             <ChainBadge chain={coin.chain} />
             <StatusBadge status={coin.status} model={coin.model} />
           </div>
-          <div className="row gap wrap small muted" style={{ marginTop: 6 }}>
+          <div className="coin-meta small muted">
             <span className="row gap-sm">
               CA <span className="mono">{shortAddr(coin.address, 6, 6)}</span>
               <CopyBtn text={coin.address} onDone={(ok) => toast(ok ? 'Contract address copied' : 'Copy failed')} />
@@ -121,7 +121,7 @@ export default function CoinPage() {
       )}
 
       <div className="coin-layout">
-        <div>
+        <div className="coin-main">
           <div className="stat-strip">
             <div className="s"><small>Market cap</small><b>{fmtUsd(coin.mcapUsd)}</b></div>
             <div className="s"><small>Price</small><b>{fmtPrice(coin.priceUsd, '$')}</b></div>
@@ -133,7 +133,7 @@ export default function CoinPage() {
 
           <PriceChart coinId={coin.id} quote={coin.quote} refreshKey={tick} />
 
-          <div className="card mt">
+          <div className="card coin-tabs">
             <div className="tabs" role="tablist">
               {([['trades', `Trades`], ['holders', `Holders (${coin.holders})`], ['thread', 'Thread'], ['about', 'About']] as [Tab, string][]).map(([k, l]) => (
                 <button key={k} className={clsx('tab', tab === k && 'on')} onClick={() => setTab(k)} role="tab" aria-selected={tab === k}>
@@ -208,7 +208,7 @@ function CurveCard({ coin }: { coin: Coin }) {
   const grad = coin.status === 'graduated';
   return (
     <div className="card">
-      <h3>{grad ? '🎓 Graduated' : 'Bonding curve'}</h3>
+      <h3>{grad ? 'Graduated' : 'Bonding curve'}</h3>
       <div className={clsx('progress', grad && 'green')}>
         <i style={{ width: `${Math.max(2, coin.progress)}%` }} />
       </div>
@@ -250,11 +250,11 @@ function RewardsCard({ coin, tick }: { coin: Coin; tick: number }) {
   return (
     <div className="card reward-box">
       <h3>{holders ? 'Holder rewards' : 'Creator rewards'}</h3>
-      <p className="small" style={{ marginTop: 0, color: '#5e584c' }}>
+      <p className="small muted" style={{ marginTop: 0 }}>
         {coin.chain === 'sol'
           ? holders
-            ? `pump.fun shares this coin's creator fees with everyone holding $${coin.symbol}. It runs inside pump.fun's own program.`
-            : `pump.fun pays the creator (${shortAddr(coin.creator)}) 0.30% of every trade into a creator vault shared across all of their pump.fun coins.`
+            ? `pump.fun shares this token's creator fees with everyone holding $${coin.symbol}. It runs inside pump.fun's own program.`
+            : `pump.fun pays the creator (${shortAddr(coin.creator)}) 0.30% of every trade into a creator vault shared across all of their pump.fun tokens.`
           : holders
             ? `0.5% of every trade is shared across everyone holding $${coin.symbol}, pro-rata. Hold to earn; claim anytime.`
             : `Half of the 1% pool fee on every trade goes to the creator (${shortAddr(coin.creator)}); the other half funds the protocol.`}
@@ -309,19 +309,19 @@ function TradesTab({ coin, tick, now }: { coin: Coin; tick: number; now: number 
   if (!trades.length) return <div className="empty">No trades yet. Be the first to buy.</div>;
   return (
     <div className="table-wrap">
-      <table className="table">
+      <table className="table stack">
         <thead>
           <tr><th>Time</th><th>Type</th><th className="num">{coin.quote}</th><th className="num">Tokens</th><th className="num">USD</th><th>Trader</th></tr>
         </thead>
         <tbody>
           {trades.map((t) => (
             <tr key={t.id} className={clsx(fresh.has(t.id) && 'flash-row')}>
-              <td className="muted">{timeAgo(t.createdAt, now)}</td>
-              <td className={t.side === 'buy' ? 'up' : 'down'} style={{ fontWeight: 700 }}>{t.side === 'buy' ? 'Buy' : 'Sell'}</td>
-              <td className="num">{fmtNum(t.quote, 4)}</td>
-              <td className="num">{fmtCompact(t.tokens)}</td>
-              <td className="num">{fmtUsd(t.usd, { precise: true })}</td>
-              <td><Link to={`/u/${t.user}`} className="mono">{shortAddr(t.user)}</Link></td>
+              <td data-label="Time" className="muted">{timeAgo(t.createdAt, now)}</td>
+              <td data-label="Type" className={t.side === 'buy' ? 'up' : 'down'} style={{ fontWeight: 700 }}>{t.side === 'buy' ? 'Buy' : 'Sell'}</td>
+              <td data-label={coin.quote} className="num">{fmtNum(t.quote, 4)}</td>
+              <td data-label="Tokens" className="num">{fmtCompact(t.tokens)}</td>
+              <td data-label="USD" className="num">{fmtUsd(t.usd, { precise: true })}</td>
+              <td data-label="Trader"><Link to={`/u/${t.user}`} className="mono accent">{shortAddr(t.user)}</Link></td>
             </tr>
           ))}
         </tbody>
@@ -336,26 +336,26 @@ function HoldersTab({ coin, tick }: { coin: Coin; tick: number }) {
   const list = data?.holders ?? [];
   return (
     <div className="table-wrap">
-      <table className="table">
+      <table className="table stack">
         <thead>
           <tr><th>#</th><th>Holder</th><th className="num">Tokens</th><th className="num">% supply</th></tr>
         </thead>
         <tbody>
           {list.map((h, i) => (
             <tr key={h.address + i}>
-              <td className="muted">{i + 1}</td>
-              <td>
+              <td data-label="Rank" className="muted">{i + 1}</td>
+              <td data-label="Holder">
                 {h.kind === 'pool' ? (
                   <span className="badge lock">{h.address}</span>
                 ) : (
                   <>
-                    <Link to={`/u/${h.address}`} className="mono">{shortAddr(h.address, 5, 5)}</Link>{' '}
+                    <Link to={`/u/${h.address}`} className="mono accent">{shortAddr(h.address, 5, 5)}</Link>{' '}
                     {h.kind === 'creator' && <span className="tag">creator</span>}
                   </>
                 )}
               </td>
-              <td className="num">{fmtCompact(h.amount)}</td>
-              <td className="num">{h.pct.toFixed(2)}%</td>
+              <td data-label="Tokens" className="num">{fmtCompact(h.amount)}</td>
+              <td data-label="% supply" className="num">{h.pct.toFixed(2)}%</td>
             </tr>
           ))}
         </tbody>
@@ -392,13 +392,13 @@ function ThreadTab({ coin }: { coin: Coin }) {
           className="textarea"
           style={{ minHeight: 64 }}
           maxLength={300}
-          placeholder={me ? 'Say something about this coin…' : 'Connect your wallet to post'}
+          placeholder={me ? 'Say something about this token…' : 'Connect your wallet to post'}
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
         <div className="row between">
           <span className="counter">{text.length}/300</span>
-          <button className="btn primary sm" disabled={busy || !text.trim()} onClick={post}>{me ? 'Post reply' : 'Connect to reply'}</button>
+          <button className="btn cyan sm" disabled={busy || !text.trim()} onClick={post}>{me ? 'Post reply' : 'Connect to reply'}</button>
         </div>
       </div>
       {loading && !data ? (
@@ -441,7 +441,7 @@ function AboutTab({ coin }: { coin: Coin }) {
         <dt>Trades</dt><dd>{fmtNum(coin.trades, 0)}</dd>
         <dt>Total volume</dt><dd>{fmtUsd(coin.volumeUsd)}</dd>
       </dl>
-      <p className="xs muted mt-sm"><IExt size={12} style={{ verticalAlign: -1 }} /> Verify this coin on-chain: {coin.chain === 'sol' ? <a className="accent" href={`https://solscan.io/token/${coin.address}`} target="_blank" rel="noopener noreferrer">Solscan</a> : info.name} · contract <span className="mono">{shortAddr(coin.address, 6, 6)}</span></p>
+      <p className="xs muted mt-sm"><IExt size={12} style={{ verticalAlign: -1 }} /> Verify this token on-chain: {coin.chain === 'sol' ? <a className="accent" href={`https://solscan.io/token/${coin.address}`} target="_blank" rel="noopener noreferrer">Solscan</a> : info.name} · contract <span className="mono">{shortAddr(coin.address, 6, 6)}</span></p>
     </div>
   );
 }

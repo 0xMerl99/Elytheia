@@ -1,6 +1,6 @@
-# Elytheia
+# ELYONPAD
 
-A multichain token launchpad. Create a coin once and launch it on a **Solana bonding curve (pump.fun)** and
+The launchpad of the Elysium ecosystem: a multichain token launchpad. Create a coin once and launch it on a **Solana bonding curve (pump.fun)** and
 **straight onto Uniswap v4 on Elysium** (a locked-liquidity pool that any Uniswap-compatible router can trade). Live charts,
 creator fee rewards, launch protection, portfolio, docs and wallet sign-in.
 
@@ -35,6 +35,27 @@ pump.fun) and treats the EVM side as "not deployed yet" until `HYP_LAUNCHPAD` is
   link is permanent, so the UI refuses to launch from localhost rather than let a coin be created with a dead image.
 
 Production: `npm run build && npm start` (one server on :8787, serving the built UI).
+
+## Front end: design system and responsive behaviour
+
+The UI is a dark Elysium-palette design (teal-black surfaces, cream text, cyan for the chain, ELYONPAD gold from the logo for the
+brand and primary actions) set in DM Sans + Geist Mono. It is presentation only: routes, API calls, wallet and chain code are untouched.
+
+| File | What it holds |
+| --- | --- |
+| `src/styles/theme.css` | design tokens (colours, radii, fonts) and shared atoms: buttons, forms, badges, cards, tables, modals, toasts |
+| `src/styles/layout.css` | header, search, wallet menu, mobile tab bar, footer, page containers |
+| `src/styles/pages.css` | home, explorer + token cards, token page, launch wizard, portfolio, docs |
+| `src/styles/responsive.css` | every breakpoint: ≤1380, ≤1180, ≤1100, ≤900 (tablet: tab bar replaces the top nav), ≤700, ≤640 (phone), ≤520, ≤350 |
+| `src/styles/intro.css` | the opening video + landing screen |
+
+On phones: bottom tab bar with a raised Launch button, full-screen search, bottom-sheet dialogs, tables that become stacked cards
+(`<table class="table stack">` plus a `data-label` on each cell), a 4-step launch wizard with a sticky action bar, and 16px form fields
+(iOS never zooms). The wallet dialog deep-links to the Phantom, Solflare and MetaMask apps when the browser has no extension.
+
+**Brand assets.** The master logo is `elyonpad_logo.jpg` (gold mark on black marble). `python scripts/make-brand.py` cuts the transparent
+mark and writes `public/brand/logo.png`, `logo-sm.png`, `og.jpg` and the favicons; `python scripts/make-marble.py` renders the veined-marble
+backdrop `public/brand/marble.jpg`. Both need `pip install pillow numpy scipy`.
 
 ## Try the Elysium side risk-free, locally
 
@@ -122,7 +143,7 @@ Put these in `.env` (see `.env.example`) or the environment.
 | `HYP_BROWSER_RPC_URL` | the RPC sent to visitors' wallets and browsers: keep any key-bearing URL out of it |
 | `METADATA_HOSTS` | extra hosts allowed for coin metadata (IPFS gateways are built in) |
 | `TOKEN_CA` | the project's own token (Solana mint). Shown on the landing screen with a Copy button and a `pump.fun/coin/<CA>` link; unset shows "Coming soon". It is also pinned first in the Launches grid as an **Official** card: name, image and links are read from the token's own on-chain metadata (the image is cached on this server), live numbers come from DexScreener, and the card links to pump.fun to trade (pump.fun prices it in HYPE, which the site's SOL-only trade engine does not support) |
-| `X_URL` | official X account, default `https://x.com/useelytheia` (landing screen, footer) |
+| `X_URL` | official X account, default `https://x.com/elyonpad` (landing screen, footer) |
 
 The opening screen plays `intro.mp4` once (no loop), then settles on the landing screen (background `public/brand/hero.jpg`,
 regenerate with `python scripts/make-hero.py` or replace it with your own 16:9 image).

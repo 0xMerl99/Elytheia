@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AppProvider } from './lib/app';
 import { ConnectModal, WalletModal, Header } from './components/Header';
-import { Footer, Rail, Toasts } from './components/Shell';
+import { Footer, TabBar, Toasts } from './components/Shell';
 import Intro from './components/Intro';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
@@ -34,9 +34,8 @@ export default function App() {
   return (
     <AppProvider>
       <Header />
-      <Rail />
-      <div className="with-rail">
-        <main>
+      <div className="app-body">
+        <main id="main">
           <ScrollToTop />
           <Suspense fallback={<Fallback />}>
             <Routes>
@@ -53,6 +52,7 @@ export default function App() {
         </main>
         <Footer />
       </div>
+      <TabBar />
       <ConnectModal />
       <WalletModal />
       <Toasts />

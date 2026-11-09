@@ -1,356 +1,125 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { api } from '../lib/api';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useApp } from '../lib/app';
-import { useNow, useStream } from '../lib/stream';
-import { useFetch } from '../lib/useFetch';
-import type { Coin, GlobalTrade, ProjectToken, Stats } from '../lib/types';
-import { clsx, fmtNum, fmtPct, fmtUsd, shortAddr } from '../lib/format';
-import { ChainBadge, CoinAvatar } from '../components/Brand';
-import { CoinCard, CoinCardSkeleton } from '../components/CoinCard';
-import { ProjectTokenCard } from '../components/ProjectTokenCard';
-import { IBolt, ILock, IRocket, IShield } from '../components/Icons';
-import { CtaArt, glowPointer, HeroArt, Laurel, Reveal, useOlympusTheme } from '../components/Olympus';
-import '../styles/olympus.css';
-
-const SORTS: [string, string][] = [
-  ['hot', '🔥 Hot'],
-  ['new', 'New'],
-  ['mcap', 'Top market cap'],
-  ['volume', 'Volume'],
-  ['live', 'Live'],
-  ['graduated', 'Graduated'],
-];
-const PAGE = 24;
+import { BRAND, LogoMark } from '../components/Brand';
+import { IBolt, ICoins, ILock, IRocket, IShield, ISwap, ITrophy, IWallet } from '../components/Icons';
+import { Reveal } from '../components/Reveal';
 
 export default function Home() {
-  const [params, setParams] = useSearchParams();
-  const sort = SORTS.some(([k]) => k === params.get('sort')) ? params.get('sort')! : 'hot';
-  const q = params.get('q') ?? '';
-  const chain = params.get('chain') ?? '';
-  const nav = useNavigate();
-  const { me, openConnect, evmCfg, evmName } = useApp();
-  const now = useNow(15_000);
-  useOlympusTheme(); // visual theme only: scopes the Olympus styling to this page
-
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [ticker, setTicker] = useState<GlobalTrade[]>([]);
-  const [king, setKing] = useState<Coin[]>([]);
-  const [coins, setCoins] = useState<Coin[] | null>(null);
-  const [total, setTotal] = useState(0);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [fresh, setFresh] = useState<Set<string>>(new Set());
-  const [search, setSearch] = useState(q);
-  // the project's own token: pinned first in the grid unless the visitor is searching or filtering to another chain
-  const projectToken = useFetch<{ token: ProjectToken | null }>('/project-token').data?.token ?? null;
-  const showOfficial = !!projectToken && !q && (chain === '' || chain === 'sol');
-  const reqSeq = useRef(0);
+  const { me, openConnect, evmCfg, evmName, chain: chainInfo } = useApp();
+  const freeLaunch = chainInfo('hyp').launchFee === 0;
 
   useEffect(() => {
-    document.title = 'Elytheia | One launch. Every chain.';
+    document.title = `${BRAND} | The launchpad of the Elysium ecosystem`;
   }, []);
 
-  const loadCoins = useCallback(
-    async (silent = false) => {
-      const my = ++reqSeq.current;
-      if (!silent) setCoins(null);
-      setError(null);
-      try {
-        const qs = new URLSearchParams({ sort, limit: String(PAGE), offset: '0' });
-        if (q) qs.set('q', q);
-        if (chain) qs.set('chain', chain);
-        const r = await api<{ coins: Coin[]; total: number }>(`/coins?${qs}`);
-        if (my !== reqSeq.current) return;
-        setCoins(r.coins);
-        setTotal(r.total);
-      } catch (e: any) {
-        if (my === reqSeq.current) setError(e.message);
-      }
-    },
-    [sort, q, chain],
-  );
-
-  useEffect(() => {
-    void loadCoins();
-  }, [loadCoins]);
-
-  useEffect(() => setSearch(q), [q]);
-
-  const loadSide = useCallback(async () => {
-    try {
-      const [s, t, k] = await Promise.all([
-        api<Stats>('/stats'),
-        api<{ trades: GlobalTrade[] }>('/trades/recent?limit=24'),
-        api<{ coins: Coin[] }>('/coins?sort=mcap&limit=3'),
-      ]);
-      setStats(s);
-      setTicker(t.trades);
-      setKing(k.coins);
-    } catch {
-      /* hero still renders */
-    }
-  }, []);
-  useEffect(() => {
-    void loadSide();
-    const t = setInterval(loadSide, 30_000);
-    return () => clearInterval(t);
-  }, [loadSide]);
-
-  // live updates (throttled)
-  const lastSide = useRef(0);
-  const lastList = useRef(0);
-  useStream((e) => {
-    const t = Date.now();
-    if (e.type === 'launch') {
-      setFresh((f) => new Set([...f, ...e.coins.map((c) => c.id)]));
-      void loadSide();
-      if (sort === 'new' && !q && !chain) setCoins((cur) => (cur ? [...e.coins, ...cur].slice(0, PAGE * 4) : cur));
-      setTimeout(() => setFresh(new Set()), 4000);
-    } else if (e.type === 'trade') {
-      if (t - lastSide.current > 4000) {
-        lastSide.current = t;
-        void loadSide();
-      }
-      if (t - lastList.current > 12_000) {
-        lastList.current = t;
-        void loadCoins(true);
-      }
-    }
-  });
-
-  const setParam = (k: string, v: string) => {
-    const next = new URLSearchParams(params);
-    if (v) next.set(k, v);
-    else next.delete(k);
-    setParams(next, { replace: true });
-  };
-
-  const loadMore = async () => {
-    if (!coins) return;
-    setLoadingMore(true);
-    try {
-      const qs = new URLSearchParams({ sort, limit: String(PAGE), offset: String(coins.length) });
-      if (q) qs.set('q', q);
-      if (chain) qs.set('chain', chain);
-      const r = await api<{ coins: Coin[]; total: number }>(`/coins?${qs}`);
-      setCoins((cur) => {
-        const seen = new Set((cur ?? []).map((c) => c.id));
-        return [...(cur ?? []), ...r.coins.filter((c) => !seen.has(c.id))];
-      });
-      setTotal(r.total);
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setLoadingMore(false);
-    }
-  };
-
-  // scroll to #coins when the URL asks for it
-  useEffect(() => {
-    if (window.location.hash === '#coins') document.getElementById('coins')?.scrollIntoView({ behavior: 'smooth' });
-  }, [sort, q]);
-
-  const spotlight = king[0];
-  const doubled = [...ticker, ...ticker];
+  const trust: [typeof IShield, string][] = [
+    [IShield, 'Non-custodial: you sign everything'],
+    ...(evmCfg ? ([[ILock, `Locked liquidity on ${evmName}`]] as [typeof IShield, string][]) : []),
+    ...(freeLaunch ? ([[IBolt, 'Free to launch']] as [typeof IShield, string][]) : []),
+  ];
 
   return (
-    <div className="oly" onPointerMove={glowPointer}>
+    <div className="home">
+      {/* ------------------------------------------------------------------ hero */}
       <section className="hero" aria-labelledby="hero-title">
-        <HeroArt />
-        <div className="hero-inner">
-          <span className="eyebrow"><IBolt size={13} /> Multichain launchpad</span>
-          <h1 id="hero-title">One launch.<br /><em>Every chain.</em></h1>
-          <p className="lead">
-            Create a coin once from a single form and launch it on a Solana bonding curve (pump.fun){evmCfg ? ` and a locked-liquidity ${evmName} pool` : ''}.
-            Trade straight from your own wallet.
-          </p>
-          <div className="hero-actions">
-            <Link to="/create" className="btn gold lg"><IRocket size={18} /> Launch a coin</Link>
-            <a href="#coins" className="btn outline-gold lg" onClick={(e) => { e.preventDefault(); document.getElementById('coins')?.scrollIntoView({ behavior: 'smooth' }); }}>
-              Explore coins
-            </a>
+        <div className="hero-grid">
+          <div className="hero-copy">
+            <span className="eyebrow cyan">Built for the Elysium ecosystem</span>
+            <h1 id="hero-title">
+              The launchpad for <em>the Elysium ecosystem</em>
+            </h1>
+            <p className="lead">
+              Create a token in one form and launch it on {evmCfg ? `a locked-liquidity ${evmName} pool and ` : ''}a Solana bonding curve.
+              Every transaction is signed in your own wallet.
+            </p>
+            <div className="hero-actions">
+              <Link to="/create" className="btn gold lg"><IRocket size={18} /> Launch a token</Link>
+            </div>
+            <ul className="trust">
+              {trust.map(([Ico, label]) => (
+                <li key={label}><Ico size={15} /> {label}</li>
+              ))}
+            </ul>
           </div>
-        </div>
-        <div className="stats-row">
-          <div className="stat"><b>{stats ? fmtNum(stats.coins, 0) : '–'}</b><span>Coins launched</span></div>
-          <div className="stat"><b>{stats ? fmtUsd(stats.volume24Usd) : '–'}</b><span>24h volume</span></div>
-          <div className="stat"><b>{stats ? fmtNum(stats.graduated, 0) : '–'}</b><span>Graduated</span></div>
-          <div className="stat"><b>{stats ? fmtNum(stats.traders24, 0) : '–'}</b><span>Traders 24h</span></div>
+
+          <div className="hero-visual" aria-hidden="true">
+            <div className="emblem">
+              <span className="ring r1" />
+              <span className="ring r2" />
+              <LogoMark size={420} />
+            </div>
+          </div>
         </div>
       </section>
 
-      {ticker.length > 0 && (
-        <div className="ticker" aria-label="Live trades">
-          <div className="ticker-track">
-            {doubled.map((t, i) => (
-              <span className="tick" key={`${t.id}-${i}`} aria-hidden={i >= ticker.length}>
-                <span className={t.side === 'buy' ? 'b' : 's'}>{t.side === 'buy' ? 'BUY' : 'SELL'}</span>
-                <span>{fmtNum(t.quote, 3)} {t.quoteSymbol}</span>
-                <span style={{ opacity: 0.6 }}>of</span>
-                <Link to={`/coin/${t.coin.id}`}>${t.coin.symbol}</Link>
-                <span style={{ opacity: 0.55 }}>by {shortAddr(t.user)}</span>
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
       <div className="page">
-        {spotlight && !q && (
-          <Reveal as="section" aria-label="Top coins">
-            <div className="king">
-              <div className="king-main">
-                <Laurel className="king-laurel" />
-                <Link to={`/coin/${spotlight.id}`} className="cover" aria-label={`Open ${spotlight.name}`} />
-                <div className="crown">♛ King of the hill</div>
-                <div className="row gap" style={{ marginTop: 12 }}>
-                  <CoinAvatar coin={spotlight} size={64} />
-                  <div>
-                    <div className="big">{spotlight.name}</div>
-                    <div className="row gap-sm"><span style={{ opacity: 0.7 }}>${spotlight.symbol}</span><ChainBadge chain={spotlight.chain} /></div>
-                  </div>
-                </div>
-                <div className="row gap" style={{ marginTop: 16, gap: 28 }}>
-                  <div><div className="xs" style={{ opacity: 0.6 }}>MARKET CAP</div><b style={{ fontSize: 22, fontFamily: 'var(--serif)' }}>{fmtUsd(spotlight.mcapUsd)}</b></div>
-                  <div><div className="xs" style={{ opacity: 0.6 }}>24H</div><b style={{ fontSize: 22, fontFamily: 'var(--serif)', color: spotlight.change24 >= 0 ? '#5fe0a8' : '#ff8e96' }}>{fmtPct(spotlight.change24)}</b></div>
-                  <div className="hide-mobile"><div className="xs" style={{ opacity: 0.6 }}>HOLDERS</div><b style={{ fontSize: 22, fontFamily: 'var(--serif)' }}>{fmtNum(spotlight.holders, 0)}</b></div>
-                </div>
-              </div>
-              {king.slice(1).map((c, i) => (
-                <CoinCard key={c.id} coin={c} now={now} />
-              ))}
-            </div>
-          </Reveal>
-        )}
-
-        <Reveal as="section" className="section" id="coins">
+        {/* ------------------------------------------------------------------ how it works */}
+        <Reveal as="section" className="section first" aria-labelledby="how">
           <div className="section-head">
             <div>
-              <h2>Launches</h2>
-              <div className="muted small">{coins ? `${fmtNum(total, 0)} coin${total === 1 ? '' : 's'}${q ? ` matching “${q}”` : ''}` : 'Loading…'}</div>
+              <span className="kicker">How it works</span>
+              <h2 id="how">From idea to live market in three steps</h2>
             </div>
           </div>
-          <div className="toolbar">
-            {SORTS.map(([k, label]) => (
-              <button key={k} className={clsx('chip', sort === k && 'on')} onClick={() => setParam('sort', k === 'hot' ? '' : k)}>
-                {label}
-              </button>
-            ))}
-            <span className="spacer" />
-            <select className="select" value={chain} onChange={(e) => setParam('chain', e.target.value)} aria-label="Filter by chain">
-              <option value="">All chains</option>
-              <option value="sol">Solana</option>
-              <option value="hyp">{evmName}</option>
-            </select>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setParam('q', search.trim());
-              }}
-            >
-              <input className="input" placeholder="Filter by name or ticker" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Filter coins" />
-            </form>
-            {(q || chain) && (
-              <button className="btn ghost sm" onClick={() => nav('/home#coins')}>Clear</button>
-            )}
-          </div>
-
-          {error && (
-            <div className="notice red">
-              Couldn't load coins: {error} <button className="linkish" onClick={() => loadCoins()}>Retry</button>
-            </div>
-          )}
-          {!coins && !error && (
-            <div className="coin-grid">{Array.from({ length: 6 }).map((_, i) => <CoinCardSkeleton key={i} />)}</div>
-          )}
-          {coins && coins.length === 0 && showOfficial && projectToken && (
-            <div className="coin-grid" style={{ marginBottom: 16 }}>
-              <ProjectTokenCard token={projectToken} />
-            </div>
-          )}
-          {coins && coins.length === 0 && (
-            <div className="empty card">
-              <h3>{q ? 'No coins match that search' : 'No coins here yet'}</h3>
-              <p>{q ? 'Try a different name or ticker. Pasting a pump.fun coin address into the search bar adds it.' : 'Launch the first one, or paste any pump.fun coin address into the search bar above to add an existing coin.'}</p>
-              <Link to="/create" className="btn gold">Launch a coin</Link>
-            </div>
-          )}
-          {coins && coins.length > 0 && (
-            <>
-              <div className="coin-grid">
-                {showOfficial && projectToken && <ProjectTokenCard token={projectToken} />}
-                {coins.map((c) => (
-                  <CoinCard key={c.id} coin={c} fresh={fresh.has(c.id)} now={now} />
-                ))}
-              </div>
-              {coins.length < total && (
-                <div className="center mt">
-                  <button className="btn ghost" onClick={loadMore} disabled={loadingMore}>
-                    {loadingMore ? <span className="spinner" /> : `Load more (${total - coins.length})`}
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </Reveal>
-
-        <div className="ornament" aria-hidden="true"><span /></div>
-
-        <Reveal as="section" className="section" aria-labelledby="how">
-          <div className="section-head"><h2 id="how">How it works</h2></div>
           <div className="steps">
             <div className="step">
-              <div className="n"><Laurel className="n-laurel" /><span>1</span></div>
+              <div className="n">1</div>
               <h3>Create once</h3>
-              <p>Name, ticker, image and links. Pick Solana, {evmName} or both. Trading fees pay you; on Solana you can share them with every holder instead.</p>
+              <p>Name, ticker, image and links. Pick {evmName}, Solana or both. Trading fees pay you; on Solana you can share them with every holder instead.</p>
             </div>
             <div className="step">
-              <div className="n"><Laurel className="n-laurel" /><span>2</span></div>
+              <div className="n">2</div>
               <h3>Confirm in your wallet</h3>
-              <p>Launching is free. Each chain is its own transaction, signed in your own wallet and paid in that chain's currency. This site never holds your funds.</p>
+              <p>{freeLaunch ? 'Launching is free. ' : ''}Each chain is its own transaction, signed in your own wallet and paid in that chain's currency. This site never holds your funds.</p>
             </div>
             <div className="step">
-              <div className="n"><Laurel className="n-laurel" /><span>3</span></div>
+              <div className="n">3</div>
               <h3>Trade everywhere</h3>
-              <p>Your coin goes live on each venue instantly. Climb the curve on Solana, trade the locked pool on {evmName}, and earn fees from both.</p>
+              <p>Your token goes live on each venue instantly. Trade the locked pool on {evmName}, climb the curve on Solana, and earn fees from both.</p>
             </div>
           </div>
         </Reveal>
 
+        {/* ------------------------------------------------------------------ venues */}
         <Reveal as="section" className="section" aria-labelledby="chains">
-          <div className="section-head"><h2 id="chains">Where your coin launches</h2></div>
+          <div className="section-head">
+            <div>
+              <span className="kicker">Venues</span>
+              <h2 id="chains">Where your token launches</h2>
+            </div>
+          </div>
           <div className="chain-cards">
-            <div className="chain-card">
-              <span className="badge sol">Solana</span>
-              <h3 style={{ marginTop: 10, fontFamily: 'var(--serif)', fontSize: 20 }}>Bonding curve</h3>
-              <p className="muted small">Price rises along a curve as people buy. Fill it and the coin graduates into a locked AMM pool.</p>
+            <div className="chain-card hyp">
+              <span className="badge hyp">{evmName}</span>
+              <h3>Straight onto Uniswap v4</h3>
+              <p className="muted small">Every token gets its own Uniswap v4 pool, seeded with all 1B tokens. Nobody, including the creator, can pull the liquidity.</p>
               <ul>
-                <li>Starts at ~28 SOL market cap, graduates at 85 SOL raised</li>
-                <li>pump.fun's own fees: 0.95% protocol + 0.30% creator</li>
-                <li>Quoted in SOL</li>
+                <li><ISwap size={14} /> Tradable on any Uniswap-compatible router</li>
+                <li><IShield size={14} /> Anti-snipe fee for the first two minutes</li>
+                <li><ILock size={14} /> Quoted in HYPE, liquidity locked</li>
               </ul>
             </div>
-            <div className="chain-card">
-              <span className="badge hyp">{evmName}</span>
-              <h3 style={{ marginTop: 10, fontFamily: 'var(--serif)', fontSize: 20 }}>Straight onto Uniswap v4</h3>
-              <p className="muted small">Every coin gets its own Uniswap v4 pool, seeded with all 1B tokens. Nobody, including the creator, can pull the liquidity.</p>
+            <div className="chain-card sol">
+              <span className="badge sol">Solana</span>
+              <h3>Solana bonding curve</h3>
+              <p className="muted small">Price rises along a curve as people buy. Fill it and the token graduates into a locked AMM pool.</p>
               <ul>
-                <li>Tradable on any Uniswap-compatible router</li>
-                <li><IShield size={13} style={{ verticalAlign: -2 }} /> Anti-snipe fee for the first two minutes</li>
-                <li>Quoted in HYPE · <ILock size={13} style={{ verticalAlign: -2 }} /> LP locked</li>
+                <li><ITrophy size={14} /> Starts at ~28 SOL market cap, graduates at 85 SOL raised</li>
+                <li><ICoins size={14} /> Fees: 0.95% protocol + 0.30% creator</li>
+                <li><IWallet size={14} /> Quoted in SOL</li>
               </ul>
             </div>
           </div>
         </Reveal>
 
+        {/* ------------------------------------------------------------------ call to action */}
         <Reveal as="section" className="cta-band">
-          <CtaArt />
-          <Laurel className="cta-laurel" />
-          <h2>Every legend has an origin.</h2>
-          <p>Give your token a beginning. It takes under a minute and you can start with zero first buy.</p>
+          <LogoMark size={96} />
+          <h2>Ready to launch?</h2>
+          <p>It takes about a minute, and a first buy is optional. Your token goes live the moment you confirm.</p>
           {me ? (
-            <Link to="/create" className="btn gold lg"><IRocket size={18} /> Launch a coin</Link>
+            <Link to="/create" className="btn gold lg"><IRocket size={18} /> Launch a token</Link>
           ) : (
             <button className="btn gold lg" onClick={() => openConnect()}>Connect wallet to start</button>
           )}

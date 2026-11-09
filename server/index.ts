@@ -111,7 +111,7 @@ void startPriceLoop().then(() => {
 });
 
 app.listen(PORT, () => {
-  console.log(`\n  Elytheia  →  http://localhost:${PORT}${IS_PROD ? '' : '   (UI via Vite on http://localhost:5173)'}`);
+  console.log(`\n  ELYONPAD  →  http://localhost:${PORT}${IS_PROD ? '' : '   (UI via Vite on http://localhost:5173)'}`);
   console.log(`  Solana    ${SOL.cluster} (pump.fun)`);
   console.log(`  EVM       ${evmEnabled() ? `${EVM.name} · launchpad ${EVM.launchpad}` : `not deployed yet (set HYP_LAUNCHPAD after deploying; chain ${EVM.chainId})`}\n`);
   if (IS_PROD && !/^https:\/\//i.test(PUBLIC_URL)) {

@@ -131,7 +131,7 @@ const startsWith = (buf: Uint8Array, prefix: readonly number[]) => prefix.every(
 export const isSolQuoted = (quoteMint: PublicKey) => quoteMint.equals(SYSTEM_PROGRAM);
 
 export const UNSUPPORTED_QUOTE_MESSAGE =
-  "This coin is priced in another token, not SOL, which Elytheia doesn't support yet. You can trade it on pump.fun.";
+  "This token is priced in another token, not SOL, which ELYONPAD doesn't support yet. You can trade it on pump.fun.";
 
 /* ----------------------------------------------------------- BondingCurve */
 

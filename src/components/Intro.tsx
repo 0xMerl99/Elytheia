@@ -3,9 +3,8 @@ import { createPortal } from 'react-dom';
 // the original file stays in the project root; Vite serves it in dev and hashes/copies it into dist on build
 import introSrc from '../../intro.mp4';
 import { useApp } from '../lib/app';
-import { copyText, shortAddr } from '../lib/format';
-import { BRAND, LogoMark } from './Brand';
-import { ICheck, ICopy, IExt, IXLogo } from './Icons';
+import { BRAND, LogoMark, TAGLINE } from './Brand';
+import { IXLogo } from './Icons';
 import '../styles/intro.css';
 
 const FADE_MS = 360; // keep in sync with the .intro transition in intro.css
@@ -15,18 +14,23 @@ const STALL_MS = 9000; // if the video has shown nothing by then (very slow link
 type Phase = 'video' | 'landing' | 'leaving' | 'gone';
 
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+/** Visitors who asked their browser to save data (or are on a 2G/3G link) go straight to the landing screen instead of fetching the 7 MB video. */
+const lightConnection = () => {
+  const c = (typeof navigator !== 'undefined' ? (navigator as any).connection : null) as { saveData?: boolean; effectiveType?: string } | null;
+  return !!c && (!!c.saveData || /(^|-)(2g|3g)$/.test(c.effectiveType ?? ''));
+};
+const skipVideo = () => reducedMotion() || lightConnection();
 
 /**
  * Opening screen, shown on every page load. It plays the intro video exactly ONCE (no loop) and settles on the
- * landing screen: wordmark, LAUNCH, the project's contract address and its links. The app underneath is inert
- * until the visitor presses LAUNCH. SKIP jumps from the video to the landing screen.
+ * landing screen: emblem, wordmark, ENTER, the project's contract address and its links. The app underneath is inert
+ * until the visitor presses ENTER. SKIP jumps from the video to the landing screen.
  */
 export default function Intro() {
-  const { config, evmCfg, evmName, toast } = useApp();
-  const [phase, setPhase] = useState<Phase>(() => (reducedMotion() ? 'landing' : 'video'));
+  const { config, evmCfg, evmName } = useApp();
+  const [phase, setPhase] = useState<Phase>(() => (skipVideo() ? 'landing' : 'video'));
   const [ready, setReady] = useState(false);
-  const [videoMounted, setVideoMounted] = useState(() => !reducedMotion());
-  const [copied, setCopied] = useState(false);
+  const [videoMounted, setVideoMounted] = useState(() => !skipVideo());
   const videoRef = useRef<HTMLVideoElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const launchRef = useRef<HTMLButtonElement>(null);
@@ -63,7 +67,7 @@ export default function Intro() {
     return () => clearTimeout(t);
   }, [phase, ready, showLanding]);
 
-  // landing screen: stop the video, let it fade out, then drop it; put the keyboard on LAUNCH
+  // landing screen: stop the video, let it fade out, then drop it; put the keyboard on ENTER
   useEffect(() => {
     if (phase !== 'landing') return;
     videoRef.current?.pause();
@@ -78,35 +82,20 @@ export default function Intro() {
     return () => clearTimeout(t);
   }, [phase]);
 
-  useEffect(() => {
-    if (!copied) return;
-    const t = setTimeout(() => setCopied(false), 1800);
-    return () => clearTimeout(t);
-  }, [copied]);
-
   if (phase === 'gone') return null;
 
-  const ca = config?.project.tokenCa ?? null;
-  const xUrl = config?.project.xUrl ?? 'https://x.com/useelytheia';
-  const xHandle = '@' + (xUrl.replace(/\/+$/, '').split('/').pop() ?? 'useelytheia');
+  const xUrl = config?.project.xUrl ?? null;
   const onLanding = phase !== 'video';
-
-  const copy = async () => {
-    if (!ca) return;
-    const ok = await copyText(ca);
-    setCopied(ok);
-    toast(ok ? 'Contract address copied' : 'Copy failed', ok ? 'ok' : 'err');
-  };
 
   return createPortal(
     <div
       className={`intro${onLanding ? ' landing' : ''}${phase === 'leaving' ? ' leaving' : ''}`}
       role="dialog"
       aria-modal="true"
-      aria-label={`${BRAND}`}
+      aria-label={BRAND}
     >
       {/* the landing backdrop: always loaded, only revealed once the video is over */}
-      <img className="intro-bg" src="/brand/hero.jpg" alt="" decoding="async" />
+      <div className="intro-bg" aria-hidden="true" />
 
       {videoMounted && (
         <video
@@ -145,51 +134,34 @@ export default function Intro() {
 
       {onLanding && (
         <div className="landing-body">
-          <div className="landing-emblem l-in" style={{ ['--d' as string]: '0.15s' }}>
-            <LogoMark size={112} />
+          <div className="landing-emblem l-in" style={{ ['--d' as string]: '0.1s' }}>
+            <LogoMark size={152} />
           </div>
-          <h1 className="landing-title l-in" style={{ ['--d' as string]: '0.3s' }}>
-            {BRAND.toUpperCase()}
+          <h1 className="landing-title l-in" style={{ ['--d' as string]: '0.25s' }}>
+            ELYON<b>PAD</b>
           </h1>
-          <p className="landing-tag l-in" style={{ ['--d' as string]: '0.5s' }}>
-            One launch. Every chain.
+          <p className="landing-tag l-in" style={{ ['--d' as string]: '0.4s' }}>
+            {TAGLINE}
           </p>
 
-          <button ref={launchRef} type="button" className="intro-launch l-in" style={{ ['--d' as string]: '0.7s' }} onClick={enterApp}>
-            <span>LAUNCH</span>
+          <button ref={launchRef} type="button" className="intro-launch l-in" style={{ ['--d' as string]: '0.55s' }} onClick={enterApp}>
+            <span>Enter</span>
           </button>
 
-          <p className="landing-desc l-in" style={{ ['--d' as string]: '0.85s' }}>
-            Launch and trade coins on Solana{evmCfg ? ` and ${evmName}` : ''}, straight from your own wallet. Free to launch.
+          <p className="landing-desc l-in" style={{ ['--d' as string]: '0.7s' }}>
+            Launch and trade tokens on {evmCfg ? `${evmName} and ` : ''}Solana, straight from your own wallet. Free to launch.
           </p>
 
-          <div className="landing-links l-in" style={{ ['--d' as string]: '1s' }}>
-            <div className={`ca-pill${ca ? '' : ' soon'}`}>
-              <span className="ca-label">CA</span>
-              {ca ? (
-                <>
-                  <code className="ca-addr" title={ca}>
-                    <span className="ca-full">{ca}</span>
-                    <span className="ca-short">{shortAddr(ca, 6, 6)}</span>
-                  </code>
-                  <button type="button" className={`ca-copy${copied ? ' ok' : ''}`} onClick={copy} aria-label="Copy contract address">
-                    {copied ? <ICheck size={13} /> : <ICopy size={13} />}
-                    <span>{copied ? 'Copied' : 'Copy'}</span>
-                  </button>
-                </>
-              ) : (
-                <span className="ca-addr muted">{config ? 'Coming soon' : '…'}</span>
+          <div className="landing-links l-in" style={{ ['--d' as string]: '0.85s' }}>
+            <div className="soon-pill">Coming soon</div>
+            <div className="landing-ext">
+              {xUrl && (
+                <a className="x-link" href={xUrl} target="_blank" rel="noopener noreferrer" aria-label={`${BRAND} on X`}>
+                  <IXLogo size={15} />
+                  <span>Follow on X</span>
+                </a>
               )}
             </div>
-            {ca && (
-              <a className="ca-link" href={`https://pump.fun/coin/${ca}`} target="_blank" rel="noopener noreferrer">
-                pump.fun <IExt size={13} />
-              </a>
-            )}
-            <a className="x-link" href={xUrl} target="_blank" rel="noopener noreferrer" aria-label={`${BRAND} on X (${xHandle})`}>
-              <IXLogo size={15} />
-              <span>{xHandle}</span>
-            </a>
           </div>
         </div>
       )}

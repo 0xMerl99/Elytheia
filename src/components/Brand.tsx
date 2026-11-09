@@ -4,18 +4,31 @@ import type { ChainId } from '../lib/types';
 import { useApp } from '../lib/app';
 import { ILock } from './Icons';
 
-export const BRAND = 'Elytheia';
+export const BRAND = 'ELYONPAD';
+export const TAGLINE = 'The launchpad of the Elysium ecosystem';
 
-/** The Elytheia emblem (public/brand/logo.png): replace that file to change the logo everywhere. */
-export function LogoMark({ size = 32 }: { size?: number }) {
-  return <img className="logo-mark" src="/brand/logo.png" width={size} height={size} alt="" decoding="async" draggable={false} />;
+/** The ELYONPAD emblem (public/brand/logo.png, a transparent cut of elyonpad_logo.jpg): replace those files to change the logo everywhere. */
+export function LogoMark({ size = 38 }: { size?: number }) {
+  return (
+    <img
+      className="logo-mark"
+      src={size > 64 ? '/brand/logo.png' : '/brand/logo-sm.png'}
+      width={size}
+      height={size}
+      alt=""
+      decoding="async"
+      draggable={false}
+    />
+  );
 }
 
 export function Logo() {
   return (
     <Link to="/home" className="logo" aria-label={`${BRAND} home`}>
       <LogoMark />
-      <span>{BRAND.toUpperCase()}</span>
+      <span className="wordmark">
+        ELYON<b>PAD</b>
+      </span>
     </Link>
   );
 }
@@ -43,8 +56,8 @@ export function CoinAvatar({
       style={{
         width: size,
         height: size,
-        fontSize: size * 0.4,
-        background: `linear-gradient(145deg, hsl(${hue} 70% 52%), hsl(${(hue + 48) % 360} 68% 36%))`,
+        fontSize: size * 0.38,
+        background: `linear-gradient(145deg, hsl(${hue} 62% 46%), hsl(${(hue + 48) % 360} 60% 28%))`,
       }}
       aria-hidden="true"
     >

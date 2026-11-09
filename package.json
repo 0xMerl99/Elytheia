@@ -1,9 +1,9 @@
 {
-  "name": "elytheia",
+  "name": "elyonpad",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Elytheia - a multichain token launchpad (Solana via pump.fun + HyperEVM)",
+  "description": "ELYONPAD - the launchpad of the Elysium ecosystem: multichain token launches (Solana via pump.fun + Elysium via Uniswap v4)",
   "scripts": {
     "dev": "concurrently -k -n api,web -c yellow,cyan \"npm:dev:server\" \"npm:dev:client\"",
     "dev:server": "tsx watch server/index.ts",
